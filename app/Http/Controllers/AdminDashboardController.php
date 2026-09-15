@@ -44,10 +44,10 @@ class AdminDashboardController extends Controller
             ->withCount(['attendances' => function ($query) {
                 $query->where('result', AttendanceResult::SUCCESS->value);
             }])
-            ->having('attendances_count', '>', 0)
             ->orderBy('attendances_count', 'desc')
             ->limit(5)
-            ->get();
+            ->get()
+            ->filter(fn ($teacher) => $teacher->attendances_count > 0);
 
         return view('admin.dashboard', [
             'school' => $school,
