@@ -46,9 +46,16 @@ class FirebaseSessionController extends Controller
             Auth::login($user, false);
             $request->session()->regenerate();
 
+            $redirectRoute = match ($user->role?->value) {
+                UserRole::ADMIN_SEKOLAH->value => route('dashboard'),
+                UserRole::GURU->value => route('student.dashboard'),
+                UserRole::SISWA->value => route('student.dashboard'),
+                default => route('login'),
+            };
+
             return response()->json([
                 'ok' => true,
-                'redirect' => $user->isAdmin() ? route('dashboard') : route('student.dashboard'),
+                'redirect' => $redirectRoute,
             ]);
         } catch (Throwable $exception) {
             report($exception);

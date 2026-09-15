@@ -30,8 +30,8 @@ class RoleMiddleware
                 'path' => $request->path(),
             ]);
 
-            return redirect()->route('profile.setup')
-                ->with('error', 'Peran pengguna tidak ditemukan. Silakan hubungi administrator.');
+            return redirect()->route('login')
+                ->with('error', 'Peran pengguna tidak ditemukan. Silakan login kembali.');
         }
 
         if (!in_array($userRole, $roles, true)) {

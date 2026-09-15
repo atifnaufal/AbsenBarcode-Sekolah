@@ -43,11 +43,14 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
         $role = $user->role?->value ?? null;
 
-        if ($role === UserRole::ADMIN_SEKOLAH->value) {
-            return redirect()->route('dashboard');
-        }
-
-        return redirect()->route('student.dashboard');
+        return match ($role) {
+            UserRole::ADMIN_SEKOLAH->value => redirect()->route('dashboard'),
+            UserRole::GURU->value => redirect()->route('student.dashboard'),
+            UserRole::SISWA->value => redirect()->route('student.dashboard'),
+            default => back()
+                ->withInput($request->only('email', 'remember'))
+                ->withErrors(['email' => 'Peran pengguna tidak dikenali. Hubungi administrator.']),
+        };
     }
 
     public function destroy(Request $request): RedirectResponse
