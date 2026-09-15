@@ -54,10 +54,12 @@ class StudentDashboardController extends Controller
             $teacherRankings = User::query()
                 ->where('role', UserRole::GURU->value)
                 ->where('active', true)
+                ->whereHas('attendances', function ($query) {
+                    $query->where('result', AttendanceResult::SUCCESS->value);
+                })
                 ->withCount(['attendances' => function ($query) {
                     $query->where('result', AttendanceResult::SUCCESS->value);
                 }])
-                ->having('attendances_count', '>', 0)
                 ->orderBy('attendances_count', 'desc')
                 ->limit(5)
                 ->get();

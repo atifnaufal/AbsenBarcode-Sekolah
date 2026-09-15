@@ -38,13 +38,16 @@ class AdminDashboardController extends Controller
         $absentStudents = max(0, $totalStudents - $presentStudents);
 
         // Fetch real teacher rankings based on present attendances
+        // Compatible with PostgreSQL (Railway) by using whereHas instead of having on alias
         $teacherRankings = User::query()
             ->where('role', UserRole::GURU->value)
             ->where('active', true)
+            ->whereHas('attendances', function ($query) {
+                $query->where('result', AttendanceResult::SUCCESS->value);
+            })
             ->withCount(['attendances' => function ($query) {
                 $query->where('result', AttendanceResult::SUCCESS->value);
             }])
-            ->having('attendances_count', '>', 0)
             ->orderBy('attendances_count', 'desc')
             ->limit(5)
             ->get();
