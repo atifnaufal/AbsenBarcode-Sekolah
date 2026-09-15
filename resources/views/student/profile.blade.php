@@ -1,282 +1,128 @@
 @extends('layouts.app')
 @section('content')
-<div class="min-h-screen bg-gradient-to-b from-[#0f1e3d]/5 to-white" x-data="profilePage()">
-    
-    {{-- Mobile Header --}}
-    <div class="sticky top-0 z-40 bg-gradient-to-r from-[#1a3a7a] via-[#2c68f5] to-[#623ed8] shadow-lg">
-        <div class="mx-auto max-w-md px-4 py-4">
-            <div class="flex items-center justify-between gap-3">
-                <h1 class="text-lg font-bold text-white">Profil & Pengaturan</h1>
-                <div class="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-bold text-sm">
-                    {{ str(auth()->user()->name)->substr(0,1)->upper() }}
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="min-h-screen bg-[#f8fafd] text-[#0f172a] font-sans" x-data="profilePage()">
 
-    <div class="mx-auto max-w-md px-4 py-4 space-y-4 pb-24">
-        
-        {{-- Status Message --}}
+    {{-- Top Header Section --}}
+    <div class="fixed top-0 left-0 w-full h-[180px] bg-gradient-to-br from-[#0f1e3d] via-[#1a3a7a] to-[#2c68f5] rounded-b-[40px] shadow-2xl z-0"></div>
+
+    <div class="mx-auto max-w-md px-5 pt-8 pb-32 relative z-10">
+
+        {{-- Page Title --}}
+        <div class="flex items-center gap-3 mb-6 text-white">
+            <a href="{{ route('student.dashboard') }}" class="h-10 w-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+                <i class="ti ti-chevron-left text-lg"></i>
+            </a>
+            <h1 class="text-xl font-black font-display tracking-tight">Pengaturan Profil</h1>
+        </div>
+
         @if(session('ok'))
-        <div class="animate-slideIn rounded-2xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 flex items-center gap-3">
+        <div class="animate-slideIn rounded-2xl bg-emerald-500 text-white px-5 py-3 text-xs font-bold flex items-center gap-3 shadow-lg mb-6">
             <i class="ti ti-circle-check text-lg"></i>
             <span class="flex-1">{{ session('ok') }}</span>
-            <button @click="$el.parentElement.remove()" class="text-green-500 hover:text-green-700">
-                <i class="ti ti-x"></i>
-            </button>
         </div>
         @endif
 
-        {{-- Profile Header Card with 3D effect --}}
-        <div class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2c68f5]/10 to-[#623ed8]/5 border border-white/50 shadow-2xl">
-            <div class="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-gradient-to-br from-[#2c68f5]/20 to-[#623ed8]/10 blur-2xl"></div>
-            
-            <div class="relative px-6 py-8 text-center space-y-4">
-                {{-- Avatar --}}
-                <div class="relative inline-block">
-                    <div class="h-24 w-24 rounded-3xl bg-gradient-to-br from-[#1a3a7a] to-[#2c68f5] flex items-center justify-center text-white font-bold text-4xl shadow-2xl ring-4 ring-white/30 mx-auto">
+        {{-- Profile Header Card --}}
+        <div class="bg-white rounded-[32px] p-6 shadow-xl border border-white mb-6 text-center">
+            <div class="relative inline-block mb-4">
+                <div class="h-24 w-24 rounded-3xl bg-gradient-to-tr from-[#2c68f5] to-[#623ed8] p-1 shadow-xl mx-auto">
+                    <div class="h-full w-full rounded-[20px] bg-[#0f1e3d] flex items-center justify-center font-display font-black text-3xl text-white">
                         {{ str(auth()->user()->name)->substr(0,1)->upper() }}
                     </div>
-                    <div class="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-green-400 ring-4 ring-white shadow-lg animate-pulse"></div>
                 </div>
+                <div class="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-emerald-500 border-4 border-white flex items-center justify-center text-white text-xs shadow-lg">
+                    <i class="ti ti-shield-check"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-black font-display text-[#0f1e3d]">{{ auth()->user()->name }}</h2>
+            <p class="text-xs font-bold text-[#64748b] mt-1 uppercase tracking-widest">{{ auth()->user()->role?->label() }}</p>
 
-                {{-- User Info --}}
-                <div>
-                    <h2 class="text-2xl font-bold text-[#0f1e3d]">{{ auth()->user()->name }}</h2>
-                    <p class="text-sm text-[#68748b] mt-1">{{ auth()->user()->role->label() }}</p>
-                </div>
-
-                {{-- Info Badges --}}
-                <div class="flex flex-wrap items-center justify-center gap-2">
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-[#f2f5fa] px-3 py-1.5 text-xs font-semibold text-[#623ed8]">
-                        <i class="ti ti-hash"></i> {{ auth()->user()->identifier }}
-                    </span>
-                    @if(auth()->user()->class_name)
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-[#f2f5fa] px-3 py-1.5 text-xs font-semibold text-[#623ed8]">
-                        <i class="ti ti-school"></i> {{ auth()->user()->class_name }}
-                    </span>
-                    @endif
-                </div>
-
-                {{-- Meta Info --}}
-                <div class="pt-4 border-t border-[#e3e8f0] text-xs text-[#8a95a8] space-y-1">
-                    <p>📧 {{ auth()->user()->email }}</p>
-                    <p>📅 Bergabung {{ auth()->user()->created_at?->translatedFormat('F Y') }}</p>
-                </div>
+            <div class="flex items-center justify-center gap-2 mt-4">
+                <span class="px-3 py-1 rounded-full bg-[#f1f5f9] text-[10px] font-black text-[#64748b] border border-[#e2e8f0]">{{ auth()->user()->identifier }}</span>
+                @if(auth()->user()->class_name)
+                <span class="px-3 py-1 rounded-full bg-[#f1f5f9] text-[10px] font-black text-[#2c68f5] border border-[#e2e8f0]">{{ auth()->user()->class_name }}</span>
+                @endif
             </div>
         </div>
 
-        {{-- Edit Profile Section --}}
-        <form method="POST" action="{{ route('student.profile.update') }}" @submit="handleSubmit" class="space-y-4">
+        {{-- Form Section --}}
+        <form method="POST" action="{{ route('student.profile.update') }}" @submit="handleSubmit" class="space-y-6">
             @csrf @method('PUT')
 
-            <div>
-                <label class="text-xs font-bold uppercase tracking-widest text-[#623ed8] block mb-3">Edit Data Diri</label>
-                
-                {{-- Full Name Field --}}
-                <div class="relative group mb-4">
-                    <div class="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-blue-600/10 rounded-2xl blur-lg group-focus-within:blur-xl transition-all"></div>
-                    <div class="relative">
-                        <label class="text-sm font-semibold text-[#172033] block mb-2">Nama Lengkap</label>
-                        <div class="relative flex items-center">
-                            <i class="ti ti-user absolute left-4 text-[#8a95a8] text-lg"></i>
-                            <input 
-                                type="text"
-                                name="name" 
-                                value="{{ old('name', auth()->user()->name) }}" 
-                                required 
-                                class="w-full h-12 rounded-xl border border-[#e3e8f0] bg-white pl-12 pr-4 text-sm focus:border-[#2c68f5] focus:ring-2 focus:ring-[#2c68f5]/20 transition outline-none"
-                                placeholder="Nama lengkap"
-                            >
-                        </div>
-                        @error('name')<p class="mt-1.5 text-xs text-red-600 flex items-center gap-1"><i class="ti ti-alert-circle text-sm"></i> {{ $message }}</p>@enderror
+            <div class="bg-white rounded-[32px] p-6 shadow-xl border border-white space-y-5">
+                <h3 class="text-[10px] font-black text-[#2c68f5] uppercase tracking-[0.2em] mb-4">Informasi Personal</h3>
+
+                <div class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-[#64748b] uppercase tracking-wider pl-1">Nama Lengkap</label>
+                        <input name="name" value="{{ old('name', auth()->user()->name) }}" required class="w-full h-12 bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl px-4 text-sm font-bold text-[#0f1e3d] focus:border-[#2c68f5] outline-none transition">
+                        @error('name')<p class="text-[10px] text-red-500 font-bold pl-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-[#64748b] uppercase tracking-wider pl-1">Email Aktif</label>
+                        <input name="email" type="email" value="{{ old('email', auth()->user()->email) }}" required class="w-full h-12 bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl px-4 text-sm font-bold text-[#0f1e3d] focus:border-[#2c68f5] outline-none transition">
+                        @error('email')<p class="text-[10px] text-red-500 font-bold pl-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
 
-                {{-- NISN/NIP Field --}}
-                <div class="relative group mb-4">
-                    <div class="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-purple-600/10 rounded-2xl blur-lg group-focus-within:blur-xl transition-all"></div>
-                    <div class="relative">
-                        <label class="text-sm font-semibold text-[#172033] block mb-2">NISN / NIP</label>
-                        <div class="relative flex items-center">
-                            <i class="ti ti-code absolute left-4 text-[#8a95a8] text-lg"></i>
-                            <input 
-                                type="text"
-                                name="identifier" 
-                                value="{{ old('identifier', auth()->user()->identifier) }}" 
-                                required 
-                                class="w-full h-12 rounded-xl border border-[#e3e8f0] bg-white pl-12 pr-4 text-sm focus:border-[#2c68f5] focus:ring-2 focus:ring-[#2c68f5]/20 transition outline-none"
-                                placeholder="NISN / NIP"
-                            >
-                        </div>
-                        @error('identifier')<p class="mt-1.5 text-xs text-red-600 flex items-center gap-1"><i class="ti ti-alert-circle text-sm"></i> {{ $message }}</p>@enderror
-                    </div>
-                </div>
+                <div class="pt-4 border-t border-[#f1f5f9]">
+                    <h3 class="text-[10px] font-black text-[#2c68f5] uppercase tracking-[0.2em] mb-4">Keamanan Akun</h3>
 
-                {{-- Email Field --}}
-                <div class="relative group mb-4">
-                    <div class="absolute inset-0 bg-gradient-to-br from-pink-400/20 to-pink-600/10 rounded-2xl blur-lg group-focus-within:blur-xl transition-all"></div>
-                    <div class="relative">
-                        <label class="text-sm font-semibold text-[#172033] block mb-2">Email</label>
-                        <div class="relative flex items-center">
-                            <i class="ti ti-mail absolute left-4 text-[#8a95a8] text-lg"></i>
-                            <input 
-                                type="email"
-                                name="email" 
-                                value="{{ old('email', auth()->user()->email) }}" 
-                                required 
-                                class="w-full h-12 rounded-xl border border-[#e3e8f0] bg-white pl-12 pr-4 text-sm focus:border-[#2c68f5] focus:ring-2 focus:ring-[#2c68f5]/20 transition outline-none"
-                                placeholder="Email"
-                            >
+                    <div class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-[#64748b] uppercase tracking-wider pl-1">Kata Sandi Baru</label>
+                            <input name="password" type="password" class="w-full h-12 bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl px-4 text-sm font-bold text-[#0f1e3d] focus:border-[#2c68f5] outline-none transition" placeholder="Biarkan kosong jika tidak diubah">
+                            @error('password')<p class="text-[10px] text-red-500 font-bold pl-1">{{ $message }}</p>@enderror
                         </div>
-                        @error('email')<p class="mt-1.5 text-xs text-red-600 flex items-center gap-1"><i class="ti ti-alert-circle text-sm"></i> {{ $message }}</p>@enderror
-                    </div>
-                </div>
 
-                {{-- Class Name Field --}}
-                <div class="relative group mb-4">
-                    <div class="absolute inset-0 bg-gradient-to-br from-green-400/20 to-green-600/10 rounded-2xl blur-lg group-focus-within:blur-xl transition-all"></div>
-                    <div class="relative">
-                        <label class="text-sm font-semibold text-[#172033] block mb-2">Kelas / Unit</label>
-                        <div class="relative flex items-center">
-                            <i class="ti ti-building absolute left-4 text-[#8a95a8] text-lg"></i>
-                            <input 
-                                type="text"
-                                name="class_name" 
-                                value="{{ old('class_name', auth()->user()->class_name) }}" 
-                                class="w-full h-12 rounded-xl border border-[#e3e8f0] bg-white pl-12 pr-4 text-sm focus:border-[#2c68f5] focus:ring-2 focus:ring-[#2c68f5]/20 transition outline-none"
-                                placeholder="Kelas / Unit (opsional)"
-                            >
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-[#64748b] uppercase tracking-wider pl-1">Konfirmasi Kata Sandi</label>
+                            <input name="password_confirmation" type="password" class="w-full h-12 bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl px-4 text-sm font-bold text-[#0f1e3d] focus:border-[#2c68f5] outline-none transition" placeholder="Ulangi kata sandi baru">
                         </div>
-                        @error('class_name')<p class="mt-1.5 text-xs text-red-600 flex items-center gap-1"><i class="ti ti-alert-circle text-sm"></i> {{ $message }}</p>@enderror
                     </div>
                 </div>
             </div>
 
-            {{-- Change Password Section --}}
-            <div class="relative pt-6 border-t border-[#e3e8f0]">
-                <label class="text-xs font-bold uppercase tracking-widest text-[#623ed8] block mb-3">Ubah Kata Sandi</label>
-                
-                {{-- Password Field --}}
-                <div class="relative group mb-4">
-                    <div class="absolute inset-0 bg-gradient-to-br from-orange-400/20 to-orange-600/10 rounded-2xl blur-lg group-focus-within:blur-xl transition-all"></div>
-                    <div class="relative">
-                        <label class="text-sm font-semibold text-[#172033] block mb-2">Kata Sandi Baru</label>
-                        <div class="relative flex items-center">
-                            <i class="ti ti-lock absolute left-4 text-[#8a95a8] text-lg"></i>
-                            <input 
-                                type="password"
-                                name="password" 
-                                class="w-full h-12 rounded-xl border border-[#e3e8f0] bg-white pl-12 pr-4 text-sm focus:border-[#2c68f5] focus:ring-2 focus:ring-[#2c68f5]/20 transition outline-none"
-                                placeholder="Kata sandi baru (abaikan jika tidak ingin mengubah)"
-                            >
-                        </div>
-                        <p class="text-xs text-[#8a95a8] mt-1">Minimal 6 karakter</p>
-                        @error('password')<p class="mt-1.5 text-xs text-red-600 flex items-center gap-1"><i class="ti ti-alert-circle text-sm"></i> {{ $message }}</p>@enderror
-                    </div>
-                </div>
-
-                {{-- Confirm Password Field --}}
-                <div class="relative group mb-4">
-                    <div class="absolute inset-0 bg-gradient-to-br from-orange-400/20 to-orange-600/10 rounded-2xl blur-lg group-focus-within:blur-xl transition-all"></div>
-                    <div class="relative">
-                        <label class="text-sm font-semibold text-[#172033] block mb-2">Konfirmasi Kata Sandi</label>
-                        <div class="relative flex items-center">
-                            <i class="ti ti-lock-check absolute left-4 text-[#8a95a8] text-lg"></i>
-                            <input 
-                                type="password"
-                                name="password_confirmation" 
-                                class="w-full h-12 rounded-xl border border-[#e3e8f0] bg-white pl-12 pr-4 text-sm focus:border-[#2c68f5] focus:ring-2 focus:ring-[#2c68f5]/20 transition outline-none"
-                                placeholder="Konfirmasi kata sandi"
-                            >
-                        </div>
-                        @error('password_confirmation')<p class="mt-1.5 text-xs text-red-600 flex items-center gap-1"><i class="ti ti-alert-circle text-sm"></i> {{ $message }}</p>@enderror
-                    </div>
-                </div>
-            </div>
-
-            {{-- Action Buttons --}}
-            <div class="flex gap-3 pt-4">
-                <button 
-                    type="submit" 
-                    @click="isSubmitting = true"
-                    :disabled="isSubmitting"
-                    class="flex-1 bg-gradient-to-r from-[#2c68f5] to-[#1a3a7a] text-white rounded-xl py-3 font-semibold text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                    <i class="ti" :class="isSubmitting ? 'ti-loader animate-spin' : 'ti-check'"></i>
-                    <span x-text="isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'"></span>
+            <div class="grid grid-cols-1 gap-4">
+                <button type="submit" class="w-full h-14 bg-gradient-to-r from-[#2c68f5] to-[#1a3a7a] text-white font-black text-sm rounded-[24px] shadow-xl shadow-[#2c68f5]/25 flex items-center justify-center gap-2" :disabled="isSubmitting">
+                    <i class="ti" :class="isSubmitting ? 'ti-loader animate-spin' : 'ti-device-floppy'"></i>
+                    <span x-text="isSubmitting ? 'Memproses...' : 'Simpan Perubahan'"></span>
                 </button>
-                <a 
-                    href="{{ route('student.dashboard') }}" 
-                    class="flex-1 bg-white border-2 border-[#e3e8f0] text-[#172033] rounded-xl py-3 font-semibold text-center hover:bg-[#f8f9fc] transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                    <i class="ti ti-arrow-left"></i>
-                    <span>Kembali</span>
-                </a>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full h-14 bg-white border border-[#e2e8f0] text-red-500 font-black text-sm rounded-[24px] shadow-md flex items-center justify-center gap-2">
+                        <i class="ti ti-logout"></i>
+                        Logout & Keluar
+                    </button>
+                </form>
             </div>
         </form>
-
-        {{-- Logout Button --}}
-        <div class="pt-4 border-t border-[#e3e8f0]">
-            <form method="POST" action="{{ route('logout') }}" class="w-full">
-                @csrf
-                <button 
-                    type="submit"
-                    class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl py-3 font-semibold text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                >
-                    <i class="ti ti-logout"></i>
-                    <span>Logout</span>
-                </button>
-            </form>
-        </div>
     </div>
 
-    {{-- Mobile Bottom Navigation --}}
-    <div class="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-white border-t border-[#e3e8f0] shadow-2xl">
-        <nav class="flex items-center justify-around">
-            <a href="{{ route('student.dashboard') }}" class="flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-center transition text-[#8a95a8] hover:text-[#172033]">
-                <i class="ti ti-calendar-event text-lg"></i>
-                <span class="text-xs font-semibold">Absensi</span>
+    {{-- Premium Bottom Tab Bar --}}
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[280px] bg-white/80 backdrop-blur-2xl border border-white/20 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] p-2 z-50">
+        <nav class="flex items-center justify-between">
+            <a href="{{ route('student.dashboard') }}" class="h-12 w-12 flex items-center justify-center rounded-full transition {{ request()->routeIs('student.dashboard') ? 'bg-[#2c68f5] text-white shadow-lg shadow-[#2c68f5]/40' : 'text-[#94a3b8] hover:text-[#0f1e3d]' }}">
+                <i class="ti ti-smart-home text-xl"></i>
             </a>
-            <a href="{{ route('attendance.scan') }}" class="flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-center transition text-[#8a95a8] hover:text-[#172033]">
-                <i class="ti ti-qrcode text-lg"></i>
-                <span class="text-xs font-semibold">Scan</span>
+            <a href="{{ route('attendance.scan') }}" class="h-14 w-14 -mt-10 flex items-center justify-center rounded-full bg-gradient-to-br from-[#ffd500] to-[#ff9900] text-[#0f1e3d] shadow-xl shadow-[#ff9900]/40 border-4 border-white transform transition hover:scale-110 active:scale-95">
+                <i class="ti ti-qrcode text-2xl"></i>
             </a>
-            <a href="{{ route('student.profile') }}" class="flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-center transition text-[#623ed8]">
-                <i class="ti ti-user text-lg"></i>
-                <span class="text-xs font-semibold">Profil</span>
+            <a href="{{ route('student.profile') }}" class="h-12 w-12 flex items-center justify-center rounded-full transition {{ request()->routeIs('student.profile') ? 'bg-[#2c68f5] text-white shadow-lg shadow-[#2c68f5]/40' : 'text-[#94a3b8] hover:text-[#0f1e3d]' }}">
+                <i class="ti ti-user-square-rounded text-xl"></i>
             </a>
         </nav>
     </div>
 </div>
 
-<style>
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-slideIn {
-    animation: slideIn 0.3s ease-out;
-}
-</style>
-
-@push('scripts')
 <script>
 function profilePage() {
     return {
         isSubmitting: false,
-        handleSubmit(e) {
-            this.isSubmitting = true;
-        }
+        handleSubmit() { this.isSubmitting = true; }
     }
 }
 </script>
-@endpush
 @endsection

@@ -70,6 +70,44 @@
                     </button>
                 </div>
             </form>
+
+            <hr class="my-8 border-school-line">
+
+            {{-- NEW: QR Schedule Config --}}
+            <form method="POST" action="{{ route('admin.location.update') }}" class="space-y-5">
+                @csrf
+                @method('PUT')
+                <div class="bg-[#f8f9fc] p-5 rounded-2xl border border-school-line">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="ti ti-clock-bolt text-lg text-[#623ed8]"></i>
+                        <h3 class="text-sm font-bold text-[#0f1e3d]">Pengaturan Jadwal QR</h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-bold uppercase tracking-wider text-[#68748b] block mb-1">Keterangan Sesi</label>
+                            <input name="attendance_label" value="{{ old('attendance_label', $school->attendance_label) }}" class="w-full h-10 rounded-lg border border-school-line px-3 text-xs focus:border-[#2c68f5] outline-none" placeholder="Contoh: Absen Masuk Sekolah">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] font-bold uppercase tracking-wider text-[#68748b] block mb-1">Jam Mulai</label>
+                                <input name="attendance_start" type="time" value="{{ old('attendance_start', $school->attendance_start ? substr($school->attendance_start, 0, 5) : '') }}" class="w-full h-10 rounded-lg border border-school-line px-3 text-xs focus:border-[#2c68f5] outline-none">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold uppercase tracking-wider text-[#68748b] block mb-1">Jam Berakhir</label>
+                                <input name="attendance_end" type="time" value="{{ old('attendance_end', $school->attendance_end ? substr($school->attendance_end, 0, 5) : '') }}" class="w-full h-10 rounded-lg border border-school-line px-3 text-xs focus:border-[#2c68f5] outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="mt-4 text-[10px] text-[#8a95a8] italic">QR Code hanya akan tampil pada monitor dan bisa dipindai dalam rentang waktu di atas.</p>
+
+                    <button type="submit" class="mt-4 w-full h-10 rounded-xl border border-[#623ed8] text-[#623ed8] font-bold text-[11px] hover:bg-[#623ed8] hover:text-white transition flex items-center justify-center gap-2">
+                        Update Jadwal QR
+                    </button>
+                </div>
+            </form>
         </div>
 
         {{-- Live Render Maps Panel --}}

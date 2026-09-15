@@ -130,19 +130,16 @@
     </div>
 
     {{-- Bottom Floating Nav bar --}}
-    <div class="fixed bottom-4 left-4 right-4 mx-auto max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-xl overflow-hidden">
-        <nav class="flex items-center justify-around">
-            <a href="{{ route('student.dashboard') }}" class="flex-1 flex flex-col items-center justify-center gap-0.5 py-3 px-2 text-center transition text-white/60 hover:text-white">
-                <i class="ti ti-layout-dashboard text-lg"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">Dashboard</span>
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[280px] bg-white/80 backdrop-blur-2xl border border-white/20 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] p-2 z-50">
+        <nav class="flex items-center justify-between">
+            <a href="{{ route('student.dashboard') }}" class="h-12 w-12 flex items-center justify-center rounded-full transition {{ request()->routeIs('student.dashboard') ? 'bg-[#2c68f5] text-white shadow-lg shadow-[#2c68f5]/40' : 'text-[#94a3b8] hover:text-[#0f1e3d]' }}">
+                <i class="ti ti-smart-home text-xl"></i>
             </a>
-            <a href="{{ route('attendance.scan') }}" class="flex-1 flex flex-col items-center justify-center gap-0.5 py-3 px-2 text-center transition text-[#ffd500]">
-                <i class="ti ti-qrcode text-lg"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">Scan QR</span>
+            <a href="{{ route('attendance.scan') }}" class="h-14 w-14 -mt-10 flex items-center justify-center rounded-full bg-gradient-to-br from-[#ffd500] to-[#ff9900] text-[#0f1e3d] shadow-xl shadow-[#ff9900]/40 border-4 border-white transform transition hover:scale-110 active:scale-95">
+                <i class="ti ti-qrcode text-2xl"></i>
             </a>
-            <a href="{{ route('student.profile') }}" class="flex-1 flex flex-col items-center justify-center gap-0.5 py-3 px-2 text-center transition text-white/60 hover:text-white">
-                <i class="ti ti-user text-lg"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">Profil Anda</span>
+            <a href="{{ route('student.profile') }}" class="h-12 w-12 flex items-center justify-center rounded-full transition {{ request()->routeIs('student.profile') ? 'bg-[#2c68f5] text-white shadow-lg shadow-[#2c68f5]/40' : 'text-[#94a3b8] hover:text-[#0f1e3d]' }}">
+                <i class="ti ti-user-square-rounded text-xl"></i>
             </a>
         </nav>
     </div>

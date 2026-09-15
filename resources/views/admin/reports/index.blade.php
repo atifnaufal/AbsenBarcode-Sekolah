@@ -85,6 +85,7 @@
                         <tr>
                             <th class="px-6 py-4 text-left">Identitas User</th>
                             <th class="px-6 py-4 text-left">Grup / Kelas</th>
+                            <th class="px-6 py-4 text-left">Keterangan</th>
                             <th class="px-6 py-4 text-center">Waktu Scan</th>
                             <th class="px-6 py-4 text-right">Status Validasi</th>
                         </tr>
@@ -94,14 +95,15 @@
                         <tr class="hover:bg-[#f8f9fc]/50 transition duration-150">
                             <td class="px-6 py-4 font-semibold text-[#0f1e3d] flex items-center gap-3">
                                 <div class="h-8 w-8 rounded-lg bg-[#2c68f5]/10 flex items-center justify-center text-xs font-bold text-[#2c68f5]">
-                                    {{ str($a->user->name)->substr(0,1)->upper() }}
+                                    {{ str($a->user?->name ?? '')->substr(0,1)->upper() }}
                                 </div>
                                 <div>
-                                    <p class="font-bold text-[#0f1e3d]">{{ $a->user->name }}</p>
-                                    <p class="text-[10px] text-[#8a95a8] font-mono mt-0.5">{{ $a->user->identifier }}</p>
+                                    <p class="font-bold text-[#0f1e3d]">{{ $a->user?->name ?? '-' }}</p>
+                                    <p class="text-[10px] text-[#8a95a8] font-mono mt-0.5">{{ $a->user?->identifier ?? '-' }}</p>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-[#68748b] font-medium">{{ $a->user->class_name ?? 'Staf / Guru' }}</td>
+                            <td class="px-6 py-4 text-[#68748b] font-medium">{{ $a->user?->class_name ?? 'Staf / Guru' }}</td>
+                            <td class="px-6 py-4 text-[#68748b] text-xs font-bold">{{ $a->session_label ?? '-' }}</td>
                             <td class="px-6 py-4 text-center font-mono font-bold text-xs text-[#0f1e3d]">{{ $a->scanned_at?->format('H:i:s') ?? '--:--' }}</td>
                             <td class="px-6 py-4 text-right">
                                 @php

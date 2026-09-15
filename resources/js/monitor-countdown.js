@@ -1,28 +1,61 @@
-export function monitorCountdown({ initial = {}, refreshUrl = '' } = {}) {
+export function monitorCountdown({ initial = {}, refreshUrl = '', isClosed = false, label = '' } = {}) {
     return {
-        seconds: Math.floor(Number(initial.countdown_seconds ?? 15)),
+        seconds: Math.floor(Number(initial?.countdown_seconds ?? 15)),
         ttl: 15,
-        qr: initial,
+        qr: initial || {},
         refreshUrl,
         refreshing: false,
         refreshTimer: null,
+        scheduleCheckTimer: null,
+        isClosed: isClosed,
+        label: label,
 
         init() {
+            if (this.isClosed) {
+                this.startScheduleCheck();
+                return;
+            }
             this.renderSeconds();
             this.refreshTimer = window.setInterval(() => this.tick(), 1000);
         },
 
         destroy() {
             window.clearInterval(this.refreshTimer);
+            window.clearInterval(this.scheduleCheckTimer);
         },
 
         tick() {
+            if (this.isClosed) return;
             if (this.seconds <= 0) {
                 this.refresh();
                 return;
             }
 
             this.seconds -= 1;
+        },
+
+        startScheduleCheck() {
+            this.scheduleCheckTimer = window.setInterval(() => this.checkSchedule(), 30000);
+        },
+
+        async checkSchedule() {
+            if (!this.refreshUrl) return;
+            try {
+                const response = await fetch(this.refreshUrl, {
+                    headers: { Accept: 'application/json' },
+                    credentials: 'same-origin',
+                });
+                if (!response.ok) return;
+                const payload = await response.json();
+                if (!payload.is_closed && payload.qr) {
+                    window.clearInterval(this.scheduleCheckTimer);
+                    this.isClosed = false;
+                    this.qr = payload.qr;
+                    this.seconds = Math.floor(Number(payload.qr.countdown_seconds ?? this.ttl));
+                    this.renderSeconds();
+                    this.refreshTimer = window.setInterval(() => this.tick(), 1000);
+                }
+            } catch (e) { /* ignore */ }
         },
 
         async refresh() {
@@ -43,6 +76,13 @@ export function monitorCountdown({ initial = {}, refreshUrl = '' } = {}) {
                 }
 
                 const payload = await response.json();
+
+                if (payload.is_closed) {
+                    this.isClosed = true;
+                    window.clearInterval(this.refreshTimer);
+                    return;
+                }
+
                 this.qr = payload.qr;
                 this.seconds = Math.floor(Number(payload.qr.countdown_seconds ?? this.ttl));
                 this.ttl = Math.floor(Number(payload.qr.countdown_seconds ?? 15)) || 15;

@@ -30,6 +30,15 @@ class AttendanceValidationService
 
         $steps['qr'] = $this->step('QR valid', 'Token masih aktif', 'passed');
         $school = $token->school;
+
+        // ✅ NEW: Check Schedule Window
+        if ($school->attendance_start && $school->attendance_end) {
+            $nowTime = now($school->timezone)->format('H:i:s');
+            if ($nowTime < $school->attendance_start || $nowTime > $school->attendance_end) {
+                return $this->failure(AttendanceResult::UNAVAILABLE, "Sesi {$school->attendance_label} sudah berakhir atau belum dimulai.", $steps);
+            }
+        }
+
         $distance = GeoDistance::meters($latitude, $longitude, $school->latitude, $school->longitude);
 
         if ($accuracy !== null && $accuracy > config('attendance.max_accuracy_meters')) {
@@ -79,6 +88,7 @@ class AttendanceValidationService
                 'accuracy_meters' => $accuracy,
                 'distance_meters' => $distance,
                 'result' => AttendanceResult::SUCCESS,
+                'session_label' => $token->school->attendance_label,
             ]);
         });
 

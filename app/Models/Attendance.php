@@ -19,6 +19,7 @@ class Attendance extends Model
         'distance_meters',
         'result',
         'failure_reason',
+        'session_label',
     ];
 
     protected function casts(): array

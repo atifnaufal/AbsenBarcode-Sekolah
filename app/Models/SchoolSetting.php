@@ -14,6 +14,9 @@ class SchoolSetting extends Model
         'longitude',
         'radius_meters',
         'timezone',
+        'attendance_start',
+        'attendance_end',
+        'attendance_label',
     ];
 
     protected function casts(): array

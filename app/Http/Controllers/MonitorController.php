@@ -21,23 +21,38 @@ class MonitorController extends Controller
     public function index(): View
     {
         $school = SchoolSetting::query()->firstOrFail();
-        $token = $this->tokens->activeOrIssue($school);
+        $isClosed = $this->isScheduleClosed($school);
+        $token = $isClosed ? null : $this->tokens->activeOrIssue($school);
+
         return view('monitor.index', [
             'school' => $school,
-            'activeQr' => $this->tokens->payload($token),
+            'activeQr' => $token ? $this->tokens->payload($token) : null,
             'summary' => $this->summary($school),
+            'isClosed' => $isClosed,
+            'schedule' => [
+                'start' => $school->attendance_start,
+                'end' => $school->attendance_end,
+                'label' => $school->attendance_label,
+            ]
         ]);
     }
 
     public function refresh(): JsonResponse
     {
         $school = SchoolSetting::query()->firstOrFail();
-        // only rotate if expired, otherwise return active
-        $active = \App\Models\AttendanceToken::query()->where('school_setting_id',$school->id)->where('active',true)->latest('issued_at')->first();
-        $token = ($active && $active->isValid()) ? $active : $this->tokens->issue($school);
-        // if reusing active without plain_token, must issue new one (plain not stored)
-        if (!$token->getAttribute('plain_token')) $token = $this->tokens->issue($school);
-        return response()->json(['ok'=>true,'qr'=>$this->tokens->payload($token)]);
+        if ($this->isScheduleClosed($school)) {
+            return response()->json(['ok' => true, 'qr' => null, 'is_closed' => true]);
+        }
+        $token = $this->tokens->activeOrIssue($school);
+        return response()->json(['ok'=>true,'qr'=>$this->tokens->payload($token), 'is_closed' => false]);
+    }
+
+    private function isScheduleClosed(SchoolSetting $school): bool
+    {
+        if (!$school->attendance_start || !$school->attendance_end) return false;
+
+        $now = now($school->timezone)->format('H:i:s');
+        return $now < $school->attendance_start || $now > $school->attendance_end;
     }
 
     public function recentScans(): JsonResponse

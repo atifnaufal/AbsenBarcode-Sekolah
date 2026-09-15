@@ -100,6 +100,7 @@
                 <th>Nama Lengkap</th>
                 <th>NISN / Nomor Induk</th>
                 <th>Grup / Kelas</th>
+                <th>Keterangan</th>
                 <th>Waktu Pemindaian</th>
                 <th>Status Hasil</th>
             </tr>
@@ -111,6 +112,7 @@
                     <td><strong>{{ $u = $a->user?->name }}</strong></td>
                     <td>{{ $a->user?->identifier }}</td>
                     <td>{{ $a->user?->class_name ?? 'Staf / Guru' }}</td>
+                    <td>{{ $a->session_label ?? '-' }}</td>
                     <td>{{ $a->scanned_at ? $a->scanned_at->format('H:i:s') : '--:--' }} WIB</td>
                     <td>
                         @if($a->result->value === 'success')
@@ -124,7 +126,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" style="text-align: center; color: #8a95a8;">Tidak ada rekaman kehadiran pada tanggal ini.</td>
+                    <td colspan="7" style="text-align: center; color: #8a95a8;">Tidak ada rekaman kehadiran pada tanggal ini.</td>
                 </tr>
             @endforelse
         </tbody>
