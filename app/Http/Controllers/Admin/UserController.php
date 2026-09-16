@@ -14,10 +14,22 @@ class UserController extends Controller
     {
         $enum = $role === 'guru' ? UserRole::GURU : UserRole::SISWA;
         $q = $request->input('q');
-        $users = User::where('role',$enum->value)->when($q, fn($qq)=>$qq->where(fn($w)=>$w->where('name','ilike',"%$q%")->orWhere('identifier','ilike',"%$q%")->orWhere('email','ilike',"%$q%")))->orderBy('name')->paginate(12)->withQueryString();
+        $className = $request->input('class_name');
+
+        $users = User::where('role', $enum->value)
+            ->when($q, fn($qq) => $qq->where(fn($w) => $w->where('name', 'ilike', "%$q%")->orWhere('identifier', 'ilike', "%$q%")->orWhere('email', 'ilike', "%$q%")))
+            ->when($className, fn($qq) => $qq->where('class_name', $className))
+            ->orderBy('name')
+            ->paginate(12)
+            ->withQueryString();
+
+        $classes = User::where('role', $enum->value)
+            ->whereNotNull('class_name')
+            ->distinct()
+            ->pluck('class_name');
 
         $school = SchoolSetting::first();
-        return view('admin.users.index', compact('users','role','q', 'school'));
+        return view('admin.users.index', compact('users', 'role', 'q', 'school', 'classes', 'className'));
     }
 
     public function toggleRegistration(Request $request, string $role)

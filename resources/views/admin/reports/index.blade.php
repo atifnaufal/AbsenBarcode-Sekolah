@@ -29,20 +29,32 @@
     <div class="bg-white rounded-2xl border border-school-line p-4 shadow-sm mb-6">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             {{-- Filter Form --}}
-            <form class="flex flex-wrap items-center gap-2 flex-1">
+            <form class="flex flex-wrap items-center gap-3 flex-1">
+                <div class="flex items-center gap-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipe Filter:</label>
+                    <select name="filter_type" class="h-10 pl-3 pr-8 rounded-xl border border-school-line text-xs font-bold text-[#0f1e3d] focus:border-[#2c68f5] focus:outline-none transition bg-slate-50">
+                        <option value="day" {{ $filterType === 'day' ? 'selected' : '' }}>Harian</option>
+                        <option value="month" {{ $filterType === 'month' ? 'selected' : '' }}>Bulanan</option>
+                        <option value="year" {{ $filterType === 'year' ? 'selected' : '' }}>Tahunan</option>
+                        <option value="semester" {{ $filterType === 'semester' ? 'selected' : '' }}>Semester</option>
+                    </select>
+                </div>
+
                 <div class="relative">
                     <i class="ti ti-calendar absolute left-3 top-1/2 -translate-y-1/2 text-base text-[#8a95a8]"></i>
                     <input type="date" name="date" value="{{ $date }}" class="h-10 pl-9 pr-3 rounded-xl border border-school-line text-xs font-semibold text-[#172033] focus:border-[#2c68f5] focus:outline-none transition">
                 </div>
+
                 <button class="h-10 px-4 rounded-xl bg-[#0f1e3d] text-xs font-bold text-white hover:bg-[#1a2d52] transition">
-                    Filter Tanggal
+                    Terapkan Filter
                 </button>
             </form>
 
             {{-- Advanced Multi Export Action Buttons Suite --}}
             <div class="flex flex-wrap items-center gap-2">
+                @php $exportParams = ['date' => $date, 'filter_type' => $filterType]; @endphp
                 {{-- CSV Export Button --}}
-                <a href="{{ route('admin.reports.export', ['date' => $date, 'format' => 'csv']) }}"
+                <a href="{{ route('admin.reports.export', array_merge($exportParams, ['format' => 'csv'])) }}"
                    @click="downloading = true; downloadType = 'CSV'; setTimeout(() => downloading = false, 2500)"
                    class="h-10 px-4 rounded-xl bg-slate-100 border border-school-line text-xs font-bold text-slate-700 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-sm">
                     <i class="ti ti-file-text text-sm text-slate-500"></i>
@@ -50,15 +62,15 @@
                 </a>
 
                 {{-- Excel Export Button Sim --}}
-                <a href="{{ route('admin.reports.export', ['date' => $date, 'format' => 'excel']) }}"
+                <a href="{{ route('admin.reports.export', array_merge($exportParams, ['format' => 'excel'])) }}"
                    @click="downloading = true; downloadType = 'Excel'; setTimeout(() => downloading = false, 2500)"
-                   class="h-10 px-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
+                   class="h-10 px-4 rounded-xl bg-emerald border border-emerald-200 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
                     <i class="ti ti-file-spreadsheet text-sm text-emerald-600"></i>
                     Export Excel
                 </a>
 
                 {{-- PDF Export Button Sim --}}
-                <a href="{{ route('admin.reports.export', ['date' => $date, 'format' => 'pdf']) }}"
+                <a href="{{ route('admin.reports.export', array_merge($exportParams, ['format' => 'pdf'])) }}"
                    @click="downloading = true; downloadType = 'PDF'; setTimeout(() => downloading = false, 2500)"
                    class="h-10 px-4 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-700 hover:bg-red-100 transition flex items-center gap-1.5 shadow-sm">
                     <i class="ti ti-file-type-pdf text-sm text-red-600"></i>

@@ -20,10 +20,22 @@
             <form class="flex flex-col sm:flex-row gap-3">
                 <div class="relative flex-1">
                     <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#8a95a8]"></i>
-                    <input name="q" value="{{ $q }}" placeholder="Cari berdasarkan nama lengkap, NISN/NIP, atau alamat email..." class="w-full h-11 pl-11 pr-4 rounded-xl border border-school-line text-sm text-[#172033] focus:border-[#2c68f5] focus:outline-none transition">
+                    <input name="q" value="{{ $q }}" placeholder="Cari nama, identitas, atau email..." class="w-full h-11 pl-11 pr-4 rounded-xl border border-school-line text-sm text-[#172033] focus:border-[#2c68f5] focus:outline-none transition">
                 </div>
+
+                {{-- NEW: Class Filter --}}
+                <div class="relative min-w-[180px]">
+                    <select name="class_name" class="w-full h-11 pl-4 pr-10 rounded-xl border border-school-line text-sm font-bold text-[#0f1e3d] appearance-none focus:border-[#2c68f5] focus:outline-none transition bg-white">
+                        <option value="">Semua {{ $role === 'siswa' ? 'Kelas' : 'Unit' }}</option>
+                        @foreach($classes as $c)
+                            <option value="{{ $c }}" {{ $className === $c ? 'selected' : '' }}>{{ $c }}</option>
+                        @endforeach
+                    </select>
+                    <i class="ti ti-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[#8a95a8] pointer-events-none"></i>
+                </div>
+
                 <button class="h-11 px-6 rounded-xl bg-[#0f1e3d] text-xs font-bold text-white hover:bg-[#1a2d52] transition">
-                    Cari Data
+                    Terapkan Filter
                 </button>
             </form>
         </div>
@@ -95,10 +107,17 @@
                         @foreach($users as $u)
                         <tr class="hover:bg-[#f8f9fc]/50 transition duration-150">
                             <td class="px-6 py-4 font-semibold text-[#0f1e3d] flex items-center gap-3">
-                                <div class="h-8 w-8 rounded-lg bg-[#2c68f5]/10 flex items-center justify-center text-xs font-bold text-[#2c68f5]">
-                                    {{ str($u->name)->substr(0,1)->upper() }}
+                                <div class="h-10 w-10 rounded-xl bg-[#2c68f5]/10 flex items-center justify-center text-xs font-bold text-[#2c68f5] overflow-hidden border border-school-line shadow-sm">
+                                    @if($u->avatar_url)
+                                        <img src="{{ $u->avatar_url }}" class="h-full w-full object-cover">
+                                    @else
+                                        {{ str($u->name)->substr(0,1)->upper() }}
+                                    @endif
                                 </div>
-                                {{ $u->name }}
+                                <div>
+                                    <p class="font-bold text-[#0f1e3d]">{{ $u->name }}</p>
+                                    <p class="text-[10px] text-[#8a95a8] font-mono mt-0.5">{{ $u->identifier }}</p>
+                                </div>
                             </td>
                             <td class="px-6 py-4 font-mono text-xs text-[#68748b]">{{ $u->identifier }}</td>
                             <td class="px-6 py-4 text-[#68748b]">{{ $u->email }}</td>

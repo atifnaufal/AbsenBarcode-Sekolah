@@ -5,24 +5,74 @@ use App\Models\Attendance;
 use Illuminate\Http\Request;
 class ReportController extends Controller{
     public function index(Request $r){
-        $date=$r->input('date', now()->toDateString());
-        $attendances=Attendance::with('user')->whereDate('attendance_date',$date)->orderBy('scanned_at','desc')->paginate(20)->withQueryString();
-        return view('admin.reports.index', compact('attendances','date'));
+        $date = $r->input('date', now()->toDateString());
+        $filterType = $r->input('filter_type', 'day'); // day, month, year, semester
+
+        $query = Attendance::with('user');
+
+        if ($filterType === 'month') {
+            $query->whereMonth('attendance_date', date('m', strtotime($date)))
+                  ->whereYear('attendance_date', date('Y', strtotime($date)));
+        } elseif ($filterType === 'year') {
+            $query->whereYear('attendance_date', date('Y', strtotime($date)));
+        } elseif ($filterType === 'semester') {
+            $month = date('m', strtotime($date));
+            $year = date('Y', strtotime($date));
+            if ($month >= 7) { // Ganjil
+                $query->whereBetween('attendance_date', ["$year-07-01", "$year-12-31"]);
+            } else { // Genap
+                $query->whereBetween('attendance_date', ["$year-01-01", "$year-06-30"]);
+            }
+        } else {
+            $query->whereDate('attendance_date', $date);
+        }
+
+        $attendances = $query->orderBy('scanned_at', 'desc')->paginate(20)->withQueryString();
+
+        $reportTitle = $this->getReportTitle($date, $filterType);
+
+        return view('admin.reports.index', compact('attendances', 'date', 'filterType', 'reportTitle'));
     }
+
     public function export(Request $r){
-        $date=$r->input('date', now()->toDateString());
-        $format=$r->input('format', 'csv');
-        $rows=Attendance::with('user')->whereDate('attendance_date',$date)->get();
+        // ... (existing export logic start)
+        $date = $r->input('date', now()->toDateString());
+        $filterType = $r->input('filter_type', 'day');
+        $format = $r->input('format', 'csv');
+
+        $query = Attendance::with('user');
+
+        if ($filterType === 'month') {
+            $query->whereMonth('attendance_date', date('m', strtotime($date)))
+                  ->whereYear('attendance_date', date('Y', strtotime($date)));
+        } elseif ($filterType === 'year') {
+            $query->whereYear('attendance_date', date('Y', strtotime($date)));
+        } elseif ($filterType === 'semester') {
+            $month = date('m', strtotime($date));
+            $year = date('Y', strtotime($date));
+            if ($month >= 7) {
+                $query->whereBetween('attendance_date', ["$year-07-01", "$year-12-31"]);
+            } else {
+                $query->whereBetween('attendance_date', ["$year-01-01", "$year-06-30"]);
+            }
+        } else {
+            $query->whereDate('attendance_date', $date);
+        }
+
+        $rows = $query->get();
+        $reportTitle = $this->getReportTitle($date, $filterType);
 
         if ($format === 'pdf') {
-            return view('admin.reports.print', compact('rows', 'date'));
+            return view('admin.reports.print', compact('rows', 'date', 'reportTitle'));
         }
 
         if ($format === 'excel') {
             $output = "<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\" xmlns=\"http://www.w3.org/TR/REC-html40\">";
             $output .= "<head><meta charset=\"utf-8\"></head><body>";
             $output .= "<h2>LAPORAN KEHADIRAN DIGITAL SMK BINA UTAMA KENDAL</h2>";
-            $output .= "<h4>Tanggal: $date</h4>";
+            $output .= "<h4>$reportTitle</h4>";
+            // ... rest of excel ...
+
             $output .= "<table border=\"1\">";
             $output .= "<tr style=\"background-color: #2c68f5; color: #ffffff; font-weight: bold;\">";
             $output .= "<th>Nama Lengkap</th><th>NISN / Nomor Induk</th><th>Grup / Kelas</th><th>Keterangan</th><th>Waktu Scan</th><th>Hasil</th>";
@@ -53,6 +103,17 @@ class ReportController extends Controller{
             $csv.="\"{$name}\",{$id},\"{$cls}\",\"{$label}\",{$time},{$a->result->value}\n";
         }
         return response($csv,200,['Content-Type'=>'text/csv','Content-Disposition'=>"attachment; filename=laporan-$date.csv"]);
+    }
+
+    private function getReportTitle(string $date, string $filterType): string
+    {
+        $dt = \Carbon\Carbon::parse($date)->locale('id');
+        return match ($filterType) {
+            'month' => 'Bulan ' . $dt->translatedFormat('F Y'),
+            'year' => 'Tahun ' . $dt->translatedFormat('Y'),
+            'semester' => 'Semester ' . ($dt->month >= 7 ? 'Ganjil' : 'Genap') . ' ' . $dt->translatedFormat('Y'),
+            default => 'Tanggal ' . $dt->translatedFormat('l, d F Y'),
+        };
     }
 
     private function sanitizeCsv(?string $value): string

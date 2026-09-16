@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Kehadiran Digital - {{ $date }}</title>
+    <title>Laporan Kehadiran Digital - {{ $reportTitle }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -86,11 +86,11 @@
     <div class="header">
         <h1>SMK BINA UTAMA KENDAL</h1>
         <p>Alamat: Jl. Raya Utama, Kabupaten Kendal, Jawa Tengah</p>
-        <p><strong>LAPORAN REKAPITULASI KEHADIRAN HARIAN DIGITAL</strong></p>
+        <p><strong>REKAPITULASI KEHADIRAN DIGITAL</strong></p>
     </div>
 
     <div class="meta-info">
-        Tanggal Rekapitulasi: {{ \Carbon\Carbon::parse($date)->locale('id')->translatedFormat('l, d F Y') }}
+        {{ $reportTitle }}
     </div>
 
     <table>
