@@ -70,28 +70,30 @@
         <div class="space-y-4">
             <h3 class="text-xs font-black text-[#0f172a] uppercase tracking-[0.15em] px-1">Ringkasan Bulan Ini</h3>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-white rounded-3xl p-5 border border-white shadow-lg">
-                    <div class="h-10 w-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-3">
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-white rounded-3xl p-4 border border-white shadow-lg">
+                    <div class="h-8 w-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mb-2">
                         <i class="ti ti-chart-bar"></i>
                     </div>
                     @php $pct = $stats['month']['total'] > 0 ? round(($stats['month']['hadir'] / $stats['month']['total']) * 100) : 0; @endphp
-                    <p class="text-[9px] font-black text-[#94a3b8] uppercase tracking-widest">Tingkat Hadir</p>
-                    <div class="flex items-end justify-between mt-1">
-                        <h3 class="text-2xl font-black text-[#0f1e3d]">{{ $pct }}%</h3>
-                        <span class="text-[10px] font-bold text-indigo-600 mb-1">{{ $stats['month']['hadir'] }} Hari</span>
-                    </div>
+                    <p class="text-[8px] font-black text-[#94a3b8] uppercase tracking-widest">Hadir</p>
+                    <h3 class="text-lg font-black text-[#0f1e3d] mt-0.5">{{ $pct }}%</h3>
                 </div>
 
-                <div class="bg-white rounded-3xl p-5 border border-white shadow-lg">
-                    <div class="h-10 w-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-xl mb-3">
+                <div class="bg-white rounded-3xl p-4 border border-white shadow-lg">
+                    <div class="h-8 w-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center text-lg mb-2">
                         <i class="ti ti-clock-bolt"></i>
                     </div>
-                    <p class="text-[9px] font-black text-[#94a3b8] uppercase tracking-widest">Keterlambatan</p>
-                    <div class="flex items-end justify-between mt-1">
-                        <h3 class="text-2xl font-black text-[#0f1e3d]">{{ $stats['month']['terlambat'] }}</h3>
-                        <span class="text-[10px] font-bold text-orange-600 mb-1">Kali</span>
+                    <p class="text-[8px] font-black text-[#94a3b8] uppercase tracking-widest">Telat</p>
+                    <h3 class="text-lg font-black text-[#0f1e3d] mt-0.5">{{ $stats['month']['terlambat'] }}x</h3>
+                </div>
+
+                <div class="bg-white rounded-3xl p-4 border border-white shadow-lg">
+                    <div class="h-8 w-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center text-lg mb-2">
+                        <i class="ti ti-user-x"></i>
                     </div>
+                    <p class="text-[8px] font-black text-[#94a3b8] uppercase tracking-widest">Alfa</p>
+                    <h3 class="text-lg font-black text-[#0f1e3d] mt-0.5">{{ $stats['month']['tidak_hadir'] }} Hari</h3>
                 </div>
             </div>
         </div>

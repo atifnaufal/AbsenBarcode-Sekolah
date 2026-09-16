@@ -40,6 +40,7 @@ class StudentDashboardController extends Controller
                 'hadir' => $monthAttendances->where('result', AttendanceResult::SUCCESS)->count(),
                 'terlambat' => $monthAttendances->whereIn('result', [AttendanceResult::EXPIRED, AttendanceResult::DUPLICATE])->count(),
                 'di_luar' => $monthAttendances->where('result', AttendanceResult::OUTSIDE_AREA)->count(),
+                'tidak_hadir' => $this->calculateAbsence($user, $school),
             ],
         ];
 
@@ -143,5 +144,27 @@ class StudentDashboardController extends Controller
         }
 
         return back()->with('ok', 'Profil dan sesi Anda berhasil diperbarui');
+    }
+
+    private function calculateAbsence($user, $school): int
+    {
+        $start = now($school->timezone)->startOfMonth();
+        $today = now($school->timezone);
+        $workDays = 0;
+
+        // Loop through days from start of month until yesterday
+        for ($date = $start->copy(); $date->lt($today); $date->addDay()) {
+            // Only count Monday to Saturday (Assume Sunday is holiday)
+            if (!$date->isSunday()) {
+                $workDays++;
+            }
+        }
+
+        $attendancesCount = Attendance::where('user_id', $user->id)
+            ->whereBetween('attendance_date', [$start->toDateString(), $today->subDay()->toDateString()])
+            ->where('result', AttendanceResult::SUCCESS)
+            ->count();
+
+        return max(0, $workDays - $attendancesCount);
     }
 }
