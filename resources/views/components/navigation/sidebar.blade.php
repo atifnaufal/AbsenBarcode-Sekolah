@@ -12,8 +12,7 @@
 
 <aside class="school-sidebar hidden w-[232px] shrink-0 flex-col px-5 py-5 xl:flex xl:min-h-screen" aria-label="Navigasi administrasi">
     <div class="mb-8 flex items-center gap-3">
-        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-school-card bg-white text-school-navy">
-            <span class="school-display text-[13px] font-bold tracking-[-0.06em]">BU</span>
+         <img src="{{ asset('images/logo-smk.png') }}" alt="Logo SMK Bina Utama Kendal" class="h-12 w-12 xl:h-[52px] xl:w-[52px] shrink-0 rounded-2xl bg-white p-[5px] shadow-[0_12px_28px_rgba(0,0,0,.3)] flex items-center justify-center animate-[tilt3d_5s_ease-in-out_infinite]" style="transform: perspective(600px) rotateY(-8deg) rotateX(6deg);">
         </div>
         <div>
             <div class="school-display text-xs font-semibold leading-4">SMK BINA</div>
