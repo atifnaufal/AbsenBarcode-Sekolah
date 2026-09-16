@@ -26,6 +26,7 @@ class AttendanceController extends Controller
             'school' => $school,
             'activeUser' => auth()->user(),
             'demoQrToken' => $token->plain_token,
+            'hideNav' => true,
         ]);
     }
 

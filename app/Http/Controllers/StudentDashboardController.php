@@ -65,7 +65,8 @@ class StudentDashboardController extends Controller
                 ->get();
         }
 
-        return view('student.dashboard', compact('user', 'school', 'stats', 'recentScans', 'teacherRankings'));
+        return view('student.dashboard', compact('user', 'school', 'stats', 'recentScans', 'teacherRankings'))
+            ->with('hideNav', true);
     }
 
     public function scan(): View
@@ -75,13 +76,15 @@ class StudentDashboardController extends Controller
         return view('attendance.scan', [
             'demoQrToken' => $token->getAttribute('plain_token'),
             'activeUser' => auth()->user(),
+            'hideNav' => true,
         ]);
     }
 
     public function profile(): View
     {
         $user = auth()->user();
-        return view('student.profile', compact('user'));
+        return view('student.profile', compact('user'))
+            ->with('hideNav', true);
     }
 
     public function updateProfile(Request $request)

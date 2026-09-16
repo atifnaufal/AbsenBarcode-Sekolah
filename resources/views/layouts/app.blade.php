@@ -13,12 +13,16 @@
     </a>
 
     <div class="min-h-screen xl:flex">
-        @include('components.navigation.sidebar', ['active' => $active ?? Route::currentRouteName()])
+        @if(!isset($hideNav))
+            @include('components.navigation.sidebar', ['active' => $active ?? Route::currentRouteName()])
+        @endif
 
         <div class="min-w-0 flex-1">
-            @include('components.navigation.topbar', ['active' => $active ?? Route::currentRouteName()])
+            @if(!isset($hideNav))
+                @include('components.navigation.topbar', ['active' => $active ?? Route::currentRouteName()])
+            @endif
 
-            <main id="main-content" class="min-w-0 px-4 py-5 sm:px-6 xl:px-8 xl:py-7">
+            <main id="main-content" class="min-w-0 {{ !isset($hideNav) ? 'px-4 py-5 sm:px-6 xl:px-8 xl:py-7' : '' }}">
                 @yield('content')
             </main>
         </div>
