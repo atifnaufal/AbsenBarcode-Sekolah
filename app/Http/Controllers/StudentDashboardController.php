@@ -51,18 +51,31 @@ class StudentDashboardController extends Controller
 
         $teacherRankings = collect();
         if ($user->role === UserRole::GURU) {
+            $startOfMonth = now($school->timezone)->startOfMonth();
+            $endOfMonth = now($school->timezone)->endOfMonth();
+
             $teacherRankings = User::query()
                 ->where('role', UserRole::GURU->value)
                 ->where('active', true)
-                ->whereHas('attendances', function ($query) {
-                    $query->where('result', AttendanceResult::SUCCESS->value);
+                ->whereHas('attendances', function ($query) use ($startOfMonth, $endOfMonth) {
+                    $query->where('result', AttendanceResult::SUCCESS->value)
+                          ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth]);
                 })
-                ->withCount(['attendances' => function ($query) {
-                    $query->where('result', AttendanceResult::SUCCESS->value);
+                ->withCount(['attendances' => function ($query) use ($startOfMonth, $endOfMonth) {
+                    $query->where('result', AttendanceResult::SUCCESS->value)
+                          ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth]);
                 }])
-                ->orderBy('attendances_count', 'desc')
+                ->withAvg(['attendances as avg_arrival_time' => function ($query) use ($startOfMonth, $endOfMonth) {
+                    $query->where('result', AttendanceResult::SUCCESS->value)
+                          ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth]);
+                }], 'scanned_at')
+                ->orderBy('avg_arrival_time', 'asc')
                 ->limit(5)
-                ->get();
+                ->get()
+                ->map(function($u) {
+                    $u->formatted_avg_time = $u->avg_arrival_time ? \Carbon\Carbon::parse($u->avg_arrival_time)->format('H:i') : '--:--';
+                    return $u;
+                });
         }
 
         return view('student.dashboard', compact('user', 'school', 'stats', 'recentScans', 'teacherRankings'))

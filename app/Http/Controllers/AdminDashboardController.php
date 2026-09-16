@@ -37,20 +37,34 @@ class AdminDashboardController extends Controller
         $presentStudents = $statsData['presentStudents'];
         $absentStudents = max(0, $totalStudents - $presentStudents);
 
-        // Fetch real teacher rankings based on present attendances
-        // Compatible with PostgreSQL (Railway) by using whereHas instead of having on alias
+        // Fetch real teacher rankings based on "Discipline" (Earliest Average Arrival Time)
+        // Calculated for the current month only. Resets automatically every month.
+        $startOfMonth = now($school->timezone)->startOfMonth();
+        $endOfMonth = now($school->timezone)->endOfMonth();
+
         $teacherRankings = User::query()
             ->where('role', UserRole::GURU->value)
             ->where('active', true)
-            ->whereHas('attendances', function ($query) {
-                $query->where('result', AttendanceResult::SUCCESS->value);
+            ->whereHas('attendances', function ($query) use ($startOfMonth, $endOfMonth) {
+                $query->where('result', AttendanceResult::SUCCESS->value)
+                      ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth]);
             })
-            ->withCount(['attendances' => function ($query) {
-                $query->where('result', AttendanceResult::SUCCESS->value);
+            ->withCount(['attendances' => function ($query) use ($startOfMonth, $endOfMonth) {
+                $query->where('result', AttendanceResult::SUCCESS->value)
+                      ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth]);
             }])
-            ->orderBy('attendances_count', 'desc')
+            ->withAvg(['attendances as avg_arrival_time' => function ($query) use ($startOfMonth, $endOfMonth) {
+                $query->where('result', AttendanceResult::SUCCESS->value)
+                      ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth]);
+            }], 'scanned_at')
+            ->orderBy('avg_arrival_time', 'asc') // Earliest average time wins
             ->limit(5)
-            ->get();
+            ->get()
+            ->map(function($user) {
+                // Convert avg_arrival_time (which might be a string timestamp) to a clean time format
+                $user->formatted_avg_time = $user->avg_arrival_time ? \Carbon\Carbon::parse($user->avg_arrival_time)->format('H:i') : '--:--';
+                return $user;
+            });
 
         return view('admin.dashboard', [
             'school' => $school,

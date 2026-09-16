@@ -68,31 +68,15 @@
         {{-- Main Dashboard Layout Structure --}}
         <div class="grid gap-6 lg:grid-cols-3">
 
-            {{-- Column 1 & 2: Recent Scans & Teacher Discipline Analysis --}}
+            {{-- Column 1 & 2: Teacher Discipline & Recent Scans --}}
             <div class="lg:col-span-2 space-y-6">
 
-                {{-- Recent Pemindaian Table --}}
-                <div class="rounded-3xl border border-school-line bg-white shadow-sm overflow-hidden">
-                    <div class="border-b border-school-line bg-white p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div>
-                            <h3 class="font-display text-lg font-bold text-[#0f1e3d]">Pemindaian Absensi Terkini</h3>
-                            <p class="text-xs text-[#8a95a8] mt-1">Aktivitas penyerapan log scan</p>
-                        </div>
-                        <a href="{{ route('admin.reports.index') }}" class="inline-flex h-9 items-center justify-center px-4 rounded-xl border border-[#623ed8] text-xs font-bold text-[#623ed8] hover:bg-[#623ed8]/5 transition">
-                            Lihat Semua Laporan
-                        </a>
-                    </div>
-                    <div class="p-0 overflow-x-auto">
-                        <x-dashboard.recent-scans :scans="$recentScans" :school="$school" />
-                    </div>
-                </div>
-
-                {{-- NEW: Teacher Discipline & Presence Achievement Analysis --}}
+                {{-- TOP: Teacher Discipline & Presence Achievement Analysis --}}
                 <div class="rounded-3xl border border-school-line bg-white p-6 shadow-sm">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <span class="text-[10px] font-black text-[#623ed8] uppercase tracking-widest bg-[#623ed8]/10 px-2 py-0.5 rounded">Analisis Khusus Guru</span>
-                            <h3 class="font-display text-lg font-bold text-[#0f1e3d] mt-1">Peringkat Tingkat Disiplin & Kehadiran Guru</h3>
+                            <span class="text-[10px] font-black text-[#623ed8] uppercase tracking-widest bg-[#623ed8]/10 px-2 py-0.5 rounded">Analisis Kedisiplinan Guru</span>
+                            <h3 class="font-display text-lg font-bold text-[#0f1e3d] mt-1">Peringkat Guru Terdisiplin Bulan Ini</h3>
                         </div>
                         <i class="ti ti-trophy text-2xl text-amber-500"></i>
                     </div>
@@ -112,17 +96,17 @@
                                     <div class="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center font-bold text-sm text-[#ffd500] border border-white/10">1st</div>
                                     <div class="min-w-0 flex-1">
                                         <p class="text-sm font-bold truncate">{{ $topTeacher->name }}</p>
-                                        <p class="text-[10px] text-white/60">Total Kehadiran: {{ $topTeacher->attendances_count }} Hari</p>
+                                        <p class="text-[10px] text-white/60">Rerata Datang: <span class="font-bold text-[#ffd500]">{{ $topTeacher->formatted_avg_time }} WIB</span></p>
                                     </div>
                                 </div>
                             </div>
 
                             {{-- Guru Summary Performance --}}
                             <div class="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-2xl p-4 border border-emerald-500/20 flex flex-col justify-center">
-                                <p class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">Aktivitas Kehadiran Staf</p>
+                                <p class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">Kriteria Penilaian</p>
                                 <div class="flex items-baseline gap-2 mt-1">
-                                    <span class="text-2xl font-black text-emerald-700">{{ $teacherRankings->count() }} Guru</span>
-                                    <span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Telah Aktif Absen</span>
+                                    <span class="text-2xl font-black text-emerald-700">Waktu Datang</span>
+                                    <span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Terawal adalah pemenang</span>
                                 </div>
                             </div>
                         </div>
@@ -131,8 +115,8 @@
                         <div class="mt-4 overflow-hidden rounded-xl border border-school-line text-xs">
                             <div class="bg-[#f2f5fa] p-2.5 font-bold text-[#0f1e3d] grid grid-cols-4">
                                 <span class="col-span-2">Nama Guru / Staf</span>
-                                <span class="text-center">Hadir Efektif</span>
-                                <span class="text-right">Skor Kehadiran</span>
+                                <span class="text-center">Hadir Bulan Ini</span>
+                                <span class="text-right">Rerata Jam Datang</span>
                             </div>
                             <div class="divide-y divide-school-line">
                                 @foreach($teacherRankings as $index => $teacher)
@@ -142,12 +126,28 @@
                                         <span class="truncate">{{ $teacher->name }}</span>
                                     </span>
                                     <span class="text-center font-mono font-bold">{{ $teacher->attendances_count }} Hari</span>
-                                    <span class="text-right font-bold text-emerald-600">Aktif</span>
+                                    <span class="text-right font-bold text-emerald-600">{{ $teacher->formatted_avg_time }} WIB</span>
                                 </div>
                                 @endforeach
                             </div>
                         </div>
                     @endif
+                </div>
+
+                {{-- Recent Pemindaian Table --}}
+                <div class="rounded-3xl border border-school-line bg-white shadow-sm overflow-hidden">
+                    <div class="border-b border-school-line bg-white p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="font-display text-lg font-bold text-[#0f1e3d]">Pemindaian Absensi Terkini</h3>
+                            <p class="text-xs text-[#8a95a8] mt-1">Aktivitas penyerapan log scan</p>
+                        </div>
+                        <a href="{{ route('admin.reports.index') }}" class="inline-flex h-9 items-center justify-center px-4 rounded-xl border border-[#623ed8] text-xs font-bold text-[#623ed8] hover:bg-[#623ed8]/5 transition">
+                            Lihat Semua Laporan
+                        </a>
+                    </div>
+                    <div class="p-0 overflow-x-auto">
+                        <x-dashboard.recent-scans :scans="$recentScans" :school="$school" />
+                    </div>
                 </div>
             </div>
 
