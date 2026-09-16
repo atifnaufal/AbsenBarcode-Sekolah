@@ -33,7 +33,7 @@ class MonitorController extends Controller
             'schedule' => [
                 'start' => $school->attendance_start,
                 'end' => $school->attendance_end,
-                'label' => $school->attendance_label ?? 'Absensi',
+                'label' => $school->attendance_label ?: '-',
             ]
         ]);
     }

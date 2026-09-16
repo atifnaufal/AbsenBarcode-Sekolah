@@ -65,7 +65,7 @@
                     </p>
                     <div class="mt-10 p-6 rounded-3xl bg-white/5 border border-white/10 inline-block">
                         <p class="text-xs font-bold text-[#ffd500] uppercase tracking-[0.2em] mb-2">Jadwal Sesi Berikutnya</p>
-                        <p class="text-2xl font-black font-mono tracking-tighter">{{ $schedule['label'] }}</p>
+                        <p class="text-2xl font-black font-mono tracking-tighter" x-text="label"></p>
                         <p class="text-3xl font-black font-mono text-white mt-2">{{ substr($schedule['start'] ?? '00:00', 0, 5) }} - {{ substr($schedule['end'] ?? '00:00', 0, 5) }}</p>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                     <div class="mt-20 text-center">
                         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
                             <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
-                            Sesi {{ $schedule['label'] }} Sedang Berlangsung
+                            Sesi <span x-text="label"></span> Sedang Berlangsung
                         </div>
                         <h2 class="text-3xl font-black font-display text-white">Silakan Arahkan Kamera HP</h2>
                         <p class="mt-2 text-white/40 text-sm font-medium">Buka aplikasi absensi di ponsel Anda untuk memindai kode</p>
