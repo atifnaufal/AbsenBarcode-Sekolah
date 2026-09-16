@@ -12,10 +12,10 @@
                 <div>
                     <div class="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-[#ffd500] bg-white/10 px-3 py-1 rounded-full border border-white/10">
                         <span class="h-2 w-2 rounded-full bg-[#ffd500] animate-pulse"></span>
-                        Pusat Kendali Utama · Profesional 3D Design
+                        Pusat Kendali Utama ·
                     </div>
                     <h1 class="font-display text-3xl font-black tracking-tight text-white sm:text-4xl">Dashboard Ringkasan Admin</h1>
-                    <p class="mt-2 text-sm text-white/80">Selamat datang kembali, <span class="font-bold text-[#ffd500]">{{ $activeUser->name }}</span>. Mengelola aktivitas kehadiran real-time SMK Bina Utama Kendal.</p>
+                    <p class="mt-2 text-sm text-white/80">Selamat datang kembali, <span class="font-bold text-[#ffd500]">{{ $activeUser->name }}</span>. Mengelola aktivitas kehadiran SMK Bina Utama Kendal.</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3">
@@ -36,7 +36,7 @@
 
         {{-- 3D Stats Cards Grid --}}
         <section class="grid gap-4 grid-cols-2 md:grid-cols-4 lg:gap-6 mb-8" aria-labelledby="stats-heading">
-            <h2 id="stats-heading" class="sr-only">Statistik Realtime Kehadiran</h2>
+            <h2 id="stats-heading" class="sr-only">Statistik Kehadiran</h2>
             @foreach($stats as $stat)
                 @php
                     $colors = [
@@ -76,7 +76,7 @@
                     <div class="border-b border-school-line bg-white p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h3 class="font-display text-lg font-bold text-[#0f1e3d]">Pemindaian Absensi Terkini</h3>
-                            <p class="text-xs text-[#8a95a8] mt-1">Aktivitas penyerapan log scan absensi secara real-time</p>
+                            <p class="text-xs text-[#8a95a8] mt-1">Aktivitas penyerapan log scan</p>
                         </div>
                         <a href="{{ route('admin.reports.index') }}" class="inline-flex h-9 items-center justify-center px-4 rounded-xl border border-[#623ed8] text-xs font-bold text-[#623ed8] hover:bg-[#623ed8]/5 transition">
                             Lihat Semua Laporan
