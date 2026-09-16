@@ -72,36 +72,36 @@
 
                 {{-- OPEN STATE: QR Display --}}
                 <div x-show="!isClosed" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="w-full flex flex-col items-center">
-                    <div class="relative p-10 bg-white rounded-[40px] shadow-[0_0_100px_rgba(44,104,245,0.2)]">
+                    <div class="relative p-6 bg-white rounded-[32px] shadow-[0_0_80px_rgba(44,104,245,0.15)]">
                         {{-- QR Container --}}
                         <div class="relative z-10">
                             @if($activeQr)
                                 <x-monitor.qr-plinth :qr="$activeQr" />
                             @else
-                                <div class="w-[320px] h-[320px] flex items-center justify-center text-slate-200">
+                                <div class="w-[260px] h-[260px] flex items-center justify-center text-slate-200">
                                     <i class="ti ti-loader animate-spin text-5xl"></i>
                                 </div>
                             @endif
                         </div>
 
                         {{-- Countdown Overlay --}}
-                        <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-[#0f1e3d] border border-white/20 px-8 py-3 rounded-2xl shadow-2xl z-20 whitespace-nowrap">
-                            <div class="flex items-center gap-4">
-                                <div class="text-[10px] font-black text-white/40 uppercase tracking-widest leading-none">Keamanan<br>Ditinjau</div>
-                                <div class="h-8 w-px bg-white/10"></div>
-                                <div class="text-2xl font-black font-mono text-[#ffd500] tabular-nums" x-text="renderSeconds()">00</div>
-                                <div class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest animate-pulse">Rotating Token</div>
+                        <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-[#0f1e3d] border border-white/20 px-6 py-2.5 rounded-2xl shadow-2xl z-20 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
+                                <div class="text-[9px] font-black text-white/40 uppercase tracking-widest leading-tight text-center">Rotating<br>Token</div>
+                                <div class="h-6 w-px bg-white/10"></div>
+                                <div class="text-xl font-black font-mono text-[#ffd500] tabular-nums" x-text="renderSeconds()">00</div>
+                                <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-20 text-center">
+                    <div class="mt-14 text-center">
                         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
                             <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
-                            Sesi <span x-text="label"></span> Sedang Berlangsung
+                            Sesi <span x-text="label"></span> Aktif
                         </div>
-                        <h2 class="text-3xl font-black font-display text-white">Silakan Arahkan Kamera HP</h2>
-                        <p class="mt-2 text-white/40 text-sm font-medium">Buka aplikasi absensi di ponsel Anda untuk memindai kode</p>
+                        <h2 class="text-2xl font-black font-display text-white">Arahkan Kamera HP</h2>
+                        <p class="mt-2 text-white/40 text-xs font-medium">Buka menu Scan QR di aplikasi ponsel Anda</p>
                     </div>
                 </div>
             </div>

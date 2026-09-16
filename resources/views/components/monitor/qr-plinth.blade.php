@@ -1,8 +1,8 @@
 @props(['qr'])
 
-<div class="qr-plinth mx-auto w-full max-w-[430px]">
-    <div class="relative rounded-[14px] bg-white p-5 shadow-school-plinth sm:p-6">
-        <div class="flex aspect-square items-center justify-center rounded-[10px] bg-white p-2">
+<div class="qr-plinth mx-auto w-full max-w-[320px]">
+    <div class="relative rounded-[24px] bg-white p-4 shadow-xl border border-school-line">
+        <div class="flex aspect-square items-center justify-center rounded-[16px] bg-white p-1">
             <img
                 :src="qr.qr_url"
                 src="{{ $qr['qr_url'] }}"
