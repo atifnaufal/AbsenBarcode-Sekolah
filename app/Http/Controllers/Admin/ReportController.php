@@ -3,63 +3,78 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Enums\UserRole;
+
 class ReportController extends Controller{
     public function index(Request $r){
         $date = $r->input('date', now()->toDateString());
-        $filterType = $r->input('filter_type', 'day'); // day, month, year, semester
+        $filterType = $r->input('filter_type', 'day');
+        $role = $r->input('role');
+        $className = $r->input('class_name');
 
-        $query = Attendance::with('user');
+        $userQuery = User::query()
+            ->where('active', true)
+            ->when($role, fn($q) => $q->where('role', $role))
+            ->when($className, fn($q) => $q->where('class_name', $className));
 
-        if ($filterType === 'month') {
-            $query->whereMonth('attendance_date', date('m', strtotime($date)))
-                  ->whereYear('attendance_date', date('Y', strtotime($date)));
-        } elseif ($filterType === 'year') {
-            $query->whereYear('attendance_date', date('Y', strtotime($date)));
-        } elseif ($filterType === 'semester') {
-            $month = date('m', strtotime($date));
-            $year = date('Y', strtotime($date));
-            if ($month >= 7) { // Ganjil
-                $query->whereBetween('attendance_date', ["$year-07-01", "$year-12-31"]);
-            } else { // Genap
-                $query->whereBetween('attendance_date', ["$year-01-01", "$year-06-30"]);
-            }
-        } else {
-            $query->whereDate('attendance_date', $date);
-        }
+        $usersCount = (clone $userQuery)->count();
 
-        $attendances = $query->orderBy('scanned_at', 'desc')->paginate(20)->withQueryString();
+        $users = $userQuery->with(['attendances' => function($q) use ($date, $filterType) {
+                if ($filterType === 'month') {
+                    $q->whereMonth('attendance_date', date('m', strtotime($date)))->whereYear('attendance_date', date('Y', strtotime($date)));
+                } elseif ($filterType === 'year') {
+                    $q->whereYear('attendance_date', date('Y', strtotime($date)));
+                } elseif ($filterType === 'semester') {
+                    $m = date('m', strtotime($date)); $y = date('Y', strtotime($date));
+                    $m >= 7 ? $q->whereBetween('attendance_date', ["$y-07-01", "$y-12-31"]) : $q->whereBetween('attendance_date', ["$y-01-01", "$y-06-30"]);
+                } else {
+                    $q->whereDate('attendance_date', $date);
+                }
+            }])
+            ->orderBy('name')
+            ->paginate(30)->withQueryString();
 
+        $presentCount = 0;
+        foreach($users as $u) { if($u->attendances->isNotEmpty()) $presentCount++; }
+
+        $classes = User::whereNotNull('class_name')->distinct()->pluck('class_name');
         $reportTitle = $this->getReportTitle($date, $filterType);
 
-        return view('admin.reports.index', compact('attendances', 'date', 'filterType', 'reportTitle'));
+        return view('admin.reports.index', compact('users', 'date', 'filterType', 'reportTitle', 'role', 'className', 'classes', 'usersCount', 'presentCount'));
+    }
+
+    public function updateKeterangan(Request $r, Attendance $attendance)
+    {
+        $r->validate(['session_label' => 'nullable|string|max:100']);
+        $attendance->update(['session_label' => $r->session_label]);
+        return back()->with('ok', 'Keterangan berhasil diperbarui.');
     }
 
     public function export(Request $r){
-        // ... (existing export logic start)
         $date = $r->input('date', now()->toDateString());
         $filterType = $r->input('filter_type', 'day');
         $format = $r->input('format', 'csv');
+        $role = $r->input('role');
+        $className = $r->input('class_name');
 
-        $query = Attendance::with('user');
+        $rows = User::query()
+            ->where('active', true)
+            ->when($role, fn($q) => $q->where('role', $role))
+            ->when($className, fn($q) => $q->where('class_name', $className))
+            ->with(['attendances' => function($q) use ($date, $filterType) {
+                if ($filterType === 'month') {
+                    $q->whereMonth('attendance_date', date('m', strtotime($date)))->whereYear('attendance_date', date('Y', strtotime($date)));
+                } elseif ($filterType === 'year') {
+                    $q->whereYear('attendance_date', date('Y', strtotime($date)));
+                } elseif ($filterType === 'semester') {
+                    $m = date('m', strtotime($date)); $y = date('Y', strtotime($date));
+                    $m >= 7 ? $q->whereBetween('attendance_date', ["$y-07-01", "$y-12-31"]) : $q->whereBetween('attendance_date', ["$y-01-01", "$y-06-30"]);
+                } else {
+                    $q->whereDate('attendance_date', $date);
+                }
+            }])->get();
 
-        if ($filterType === 'month') {
-            $query->whereMonth('attendance_date', date('m', strtotime($date)))
-                  ->whereYear('attendance_date', date('Y', strtotime($date)));
-        } elseif ($filterType === 'year') {
-            $query->whereYear('attendance_date', date('Y', strtotime($date)));
-        } elseif ($filterType === 'semester') {
-            $month = date('m', strtotime($date));
-            $year = date('Y', strtotime($date));
-            if ($month >= 7) {
-                $query->whereBetween('attendance_date', ["$year-07-01", "$year-12-31"]);
-            } else {
-                $query->whereBetween('attendance_date', ["$year-01-01", "$year-06-30"]);
-            }
-        } else {
-            $query->whereDate('attendance_date', $date);
-        }
-
-        $rows = $query->get();
         $reportTitle = $this->getReportTitle($date, $filterType);
 
         if ($format === 'pdf') {
@@ -71,38 +86,27 @@ class ReportController extends Controller{
             $output .= "<head><meta charset=\"utf-8\"></head><body>";
             $output .= "<h2>LAPORAN KEHADIRAN DIGITAL SMK BINA UTAMA KENDAL</h2>";
             $output .= "<h4>$reportTitle</h4>";
-            // ... rest of excel ...
-
-            $output .= "<table border=\"1\">";
-            $output .= "<tr style=\"background-color: #2c68f5; color: #ffffff; font-weight: bold;\">";
-            $output .= "<th>Nama Lengkap</th><th>NISN / Nomor Induk</th><th>Grup / Kelas</th><th>Keterangan</th><th>Waktu Scan</th><th>Hasil</th>";
-            $output .= "</tr>";
-            foreach($rows as $a) {
-                $time = $a->scanned_at ? $a->scanned_at->format('H:i:s') : '--:--';
-                $name = htmlspecialchars((string) $a->user?->name, ENT_QUOTES, 'UTF-8');
-                $id = htmlspecialchars((string) $a->user?->identifier, ENT_QUOTES, 'UTF-8');
-                $cls = htmlspecialchars((string) $a->user?->class_name, ENT_QUOTES, 'UTF-8');
-                $label = htmlspecialchars((string) $a->session_label, ENT_QUOTES, 'UTF-8');
-                $output .= "<tr><td>{$name}</td><td>{$id}</td><td>{$cls}</td><td>{$label}</td><td>{$time}</td><td>{$a->result->value}</td></tr>";
+            $output .= "<table border=\"1\"><tr style=\"background-color: #2c68f5; color: #ffffff;\"><th>Nama</th><th>ID</th><th>Kelas</th><th>Waktu</th><th>Status</th><th>Keterangan</th></tr>";
+            foreach($rows as $u) {
+                $a = $u->attendances->first();
+                $time = $a ? ($a->scanned_at ? $a->scanned_at->format('H:i:s') : '--:--') : '-';
+                $status = $a ? ($a->result->value === 'success' ? 'Hadir' : 'Telat/Lainnya') : 'Tidak Hadir';
+                $label = $a ? $a->session_label : '-';
+                $output .= "<tr><td>{$u->name}</td><td>'{$u->identifier}</td><td>{$u->class_name}</td><td>{$time}</td><td>{$status}</td><td>{$label}</td></tr>";
             }
             $output .= "</table></body></html>";
-            return response($output, 200, [
-                'Content-Type' => 'application/vnd.ms-excel',
-                'Content-Disposition' => "attachment; filename=laporan-$date.xls",
-                'Cache-Control' => 'max-age=0'
-            ]);
+            return response($output, 200, ['Content-Type' => 'application/vnd.ms-excel', 'Content-Disposition' => "attachment; filename=laporan.xls"]);
         }
 
-        $csv="Nama,NISN,Kelas,Keterangan,Waktu,Hasil\n";
-        foreach($rows as $a) {
-            $time = $a->scanned_at ? $a->scanned_at->format('H:i:s') : '';
-            $name = $this->sanitizeCsv($a->user?->name);
-            $id = $a->user?->identifier;
-            $cls = $this->sanitizeCsv($a->user?->class_name);
-            $label = $this->sanitizeCsv($a->session_label);
-            $csv.="\"{$name}\",{$id},\"{$cls}\",\"{$label}\",{$time},{$a->result->value}\n";
+        $csv="Nama,ID,Kelas,Waktu,Status,Keterangan\n";
+        foreach($rows as $u) {
+            $a = $u->attendances->first();
+            $time = $a ? ($a->scanned_at ? $a->scanned_at->format('H:i:s') : '') : '';
+            $status = $a ? 'Hadir' : 'Tidak Hadir';
+            $label = $a ? $this->sanitizeCsv($a->session_label) : '';
+            $csv.="\"{$u->name}\",{$u->identifier},\"{$u->class_name}\",{$time},{$status},\"{$label}\"\n";
         }
-        return response($csv,200,['Content-Type'=>'text/csv','Content-Disposition'=>"attachment; filename=laporan-$date.csv"]);
+        return response($csv,200,['Content-Type'=>'text/csv','Content-Disposition'=>"attachment; filename=laporan.csv"]);
     }
 
     private function getReportTitle(string $date, string $filterType): string

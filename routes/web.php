@@ -50,6 +50,7 @@ Route::middleware(['auth', 'role:admin_sekolah'])->group(function () {
 
         // NEW: Attendance CRUD for Admin
         Route::put('/attendances/{attendance}', [\App\Http\Controllers\Admin\AttendanceController::class, 'update'])->name('attendances.update');
+        Route::patch('/attendances/{attendance}/keterangan', [\App\Http\Controllers\Admin\ReportController::class, 'updateKeterangan'])->name('attendances.update-keterangan');
         Route::delete('/attendances/{attendance}', [\App\Http\Controllers\Admin\AttendanceController::class, 'destroy'])->name('attendances.destroy');
 
         // NEW: Schedule Management

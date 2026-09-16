@@ -100,33 +100,38 @@
                 <th>Nama Lengkap</th>
                 <th>NISN / Nomor Induk</th>
                 <th>Grup / Kelas</th>
-                <th>Keterangan</th>
-                <th>Waktu Pemindaian</th>
+                <th>Waktu Scan</th>
                 <th>Status Hasil</th>
+                <th>Keterangan</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($rows as $index => $a)
-                <tr>
+            @forelse($rows as $index => $u)
+                @php $a = $u->attendances->first(); @endphp
+                <tr style="{{ !$a ? 'background-color: #fff1f2;' : '' }}">
                     <td>{{ $index + 1 }}</td>
-                    <td><strong>{{ $u = $a->user?->name }}</strong></td>
-                    <td>{{ $a->user?->identifier }}</td>
-                    <td>{{ $a->user?->class_name ?? 'Staf / Guru' }}</td>
-                    <td>{{ $a->session_label ?? '-' }}</td>
-                    <td>{{ $a->scanned_at ? $a->scanned_at->format('H:i:s') : '--:--' }} WIB</td>
+                    <td><strong>{{ $u->name }}</strong></td>
+                    <td>{{ $u->identifier }}</td>
+                    <td>{{ $u->class_name ?? 'Staf / Guru' }}</td>
+                    <td>{{ $a && $a->scanned_at ? $a->scanned_at->format('H:i:s') : '--:--' }}</td>
                     <td>
-                        @if($a->result->value === 'success')
-                            <span class="badge badge-success">Hadir</span>
-                        @elseif($a->result->value === 'late')
-                            <span class="badge badge-late">Terlambat</span>
+                        @if($a)
+                            @if($a->result->value === 'success')
+                                <span class="badge badge-success">Hadir</span>
+                            @elseif($a->result->value === 'late')
+                                <span class="badge badge-late">Terlambat</span>
+                            @else
+                                <span class="badge badge-danger">{{ $a->result->value }}</span>
+                            @endif
                         @else
-                            <span class="badge badge-danger">{{ $a->result->value }}</span>
+                            <span class="badge badge-danger" style="background-color: #991b1b; color: white;">Tidak Hadir</span>
                         @endif
                     </td>
+                    <td>{{ $a ? $a->session_label : '-' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align: center; color: #8a95a8;">Tidak ada rekaman kehadiran pada tanggal ini.</td>
+                    <td colspan="7" style="text-align: center; color: #8a95a8;">Tidak ada rekaman data.</td>
                 </tr>
             @endforelse
         </tbody>
