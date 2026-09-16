@@ -79,11 +79,11 @@
                         <i class="ti text-[#94a3b8] transition-transform duration-300" :class="openFaq === 2 ? 'ti-chevron-up rotate-180 text-[#2c68f5]' : 'ti-chevron-down'"></i>
                     </button>
                     <div x-show="openFaq === 2" x-collapse x-cloak class="mt-2 text-[11px] text-[#64748b] leading-relaxed">
-                        Hal ini biasanya terjadi karena izin lokasi diblokir atau GPS tidak akurat. Coba muat ulang halaman, pastikan anda tidak menggunakan VPN, dan berada di area terbuka untuk akurasi GPS maksimal.
+                        Hal ini biasanya terjadi karena izin lokasi diblokir atau GPS anda tidak akurat. Coba muat ulang halaman, pastikan anda tidak menggunakan VPN, dan berada di area terbuka untuk akurasi GPS anda maksimal.
                     </div>
                 </div>
 
-                {{-- FAQ 3 --}}
+                {{-- FAQ 3
                 <div class="py-3">
                     <button @click="openFaq = (openFaq === 3 ? null : 3)" class="w-full flex items-center justify-between text-left group">
                         <span class="text-xs font-bold text-[#0f1e3d] group-hover:text-[#2c68f5] transition-colors">Mengapa QR Code tidak muncul?</span>
@@ -93,15 +93,15 @@
                         Monitor hanya menampilkan QR Code pada jam operasional yang telah ditentukan sekolah. Jika di luar jadwal, sistem akan otomatis menutup akses absensi.
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="mt-4 pt-4 border-t border-slate-50 flex items-center gap-3">
                 <div class="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-                    <i class="ti ti-brand-whatsapp text-lg"></i>
+                    <i class="ti ti-messages text-lg"></i>
                 </div>
                 <div>
                     <p class="text-[10px] font-black text-[#0f1e3d]">Butuh Bantuan Lain?</p>
-                    <p class="text-[9px] text-[#94a3b8] font-bold uppercase tracking-tighter">Hubungi Admin IT Sekolah</p>
+                    <p class="text-[9px] text-[#94a3b8] font-bold uppercase tracking-tighter">Hubungi Admin IT Sekolah Anda</p>
                 </div>
             </div>
         </div>
