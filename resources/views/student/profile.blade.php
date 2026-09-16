@@ -34,8 +34,12 @@
                 <div class="absolute -top-4 -right-4 h-24 w-24 bg-slate-50 rounded-full opacity-50"></div>
                 <div class="relative inline-block mb-4">
                     <div class="h-24 w-24 rounded-3xl bg-gradient-to-tr from-[#2c68f5] to-[#623ed8] p-1 shadow-xl mx-auto">
-                        <div class="h-full w-full rounded-[20px] bg-[#0f1e3d] flex items-center justify-center font-display font-black text-3xl text-white">
-                            {{ str(auth()->user()->name)->substr(0,1)->upper() }}
+                        <div class="h-full w-full rounded-[20px] bg-[#0f1e3d] flex items-center justify-center font-display font-black text-3xl text-white overflow-hidden">
+                            @if(auth()->user()->avatar_url)
+                                <img src="{{ auth()->user()->avatar_url }}" class="h-full w-full object-cover">
+                            @else
+                                {{ str(auth()->user()->name)->substr(0,1)->upper() }}
+                            @endif
                         </div>
                     </div>
                     <div class="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-emerald-500 border-4 border-white flex items-center justify-center text-white text-[10px] shadow-lg">
@@ -122,9 +126,32 @@
                 <h1 class="text-xl font-black font-display tracking-tight">Informasi Pribadi</h1>
             </div>
 
-            <form method="POST" action="{{ route('student.profile.update') }}" @submit="handleSubmit" class="space-y-6">
+            <form method="POST" action="{{ route('student.profile.update') }}" @submit="handleSubmit" enctype="multipart/form-data" class="space-y-6">
                 @csrf @method('PUT')
                 <div class="bg-white rounded-[32px] p-7 shadow-2xl border border-white space-y-6">
+                    {{-- Avatar Upload --}}
+                    <div class="flex flex-col items-center justify-center pb-4">
+                        <div class="relative group cursor-pointer" @click="$refs.avatarInput.click()">
+                            <div class="h-20 w-20 rounded-2xl bg-slate-100 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden">
+                                <template x-if="!avatarPreview">
+                                    @if(auth()->user()->avatar)
+                                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="h-full w-full object-cover">
+                                    @else
+                                        <i class="ti ti-camera text-2xl text-slate-300"></i>
+                                    @endif
+                                </template>
+                                <template x-if="avatarPreview">
+                                    <img :src="avatarPreview" class="h-full w-full object-cover">
+                                </template>
+                            </div>
+                            <div class="absolute -bottom-1 -right-1 h-6 w-6 rounded-lg bg-[#2c68f5] text-white flex items-center justify-center shadow-lg border-2 border-white">
+                                <i class="ti ti-plus text-[10px]"></i>
+                            </div>
+                        </div>
+                        <input type="file" name="avatar" x-ref="avatarInput" class="hidden" accept="image/*" @change="handleAvatarChange">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2">Ketuk untuk Ganti Foto</p>
+                    </div>
+
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Nama Lengkap Sesuai Dapodik</label>
                         <input name="name" value="{{ old('name', auth()->user()->name) }}" required class="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 text-sm font-bold text-[#0f1e3d] focus:border-[#2c68f5] focus:bg-white outline-none transition-all shadow-inner">
@@ -210,8 +237,19 @@ function profilePage() {
         state: 'menu',
         isSubmitting: false,
         isLoggingOut: false,
+        avatarPreview: null,
         handleSubmit() {
             this.isSubmitting = true;
+        },
+        handleAvatarChange(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.avatarPreview = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
         },
         confirmLogout() {
             if (confirm('Apakah Anda yakin ingin mengakhiri sesi dan keluar dari sistem?')) {

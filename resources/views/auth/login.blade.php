@@ -91,6 +91,26 @@
             </button>
         </form>
 
+        {{-- NEW: Dynamic Registration Links --}}
+        @php $school = \App\Models\SchoolSetting::first(); @endphp
+        @if($school && ($school->registration_enabled_students || $school->registration_enabled_teachers))
+        <div class="mt-8 pt-6 border-t border-slate-100 space-y-4">
+            <p class="text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Belum Terdaftar?</p>
+            <div class="flex flex-col sm:flex-row gap-3">
+                @if($school->registration_enabled_students)
+                <a href="{{ route('register', ['role' => 'siswa']) }}" class="flex-1 h-12 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center text-[10px] font-black text-[#2c68f5] uppercase tracking-widest hover:bg-blue-100 transition">
+                    Daftar Sebagai Siswa
+                </a>
+                @endif
+                @if($school->registration_enabled_teachers)
+                <a href="{{ route('register', ['role' => 'guru']) }}" class="flex-1 h-12 bg-purple-50 border border-purple-100 rounded-xl flex items-center justify-center text-[10px] font-black text-purple-600 uppercase tracking-widest hover:bg-purple-100 transition">
+                    Daftar Sebagai Guru
+                </a>
+                @endif
+            </div>
+        </div>
+        @endif
+
         <p class="mt-6 text-center text-[11px] text-[#8a95a8]">© {{ date('Y') }} SMK Bina Utama Kendal</p>
     </section>
 </div>

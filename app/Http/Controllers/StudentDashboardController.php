@@ -108,10 +108,18 @@ class StudentDashboardController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'identifier' => 'required|string|max:30|unique:users,identifier,' . $user->id,
-            'class_name' => 'nullable|string|max:50',
             'password' => 'nullable|min:6|confirmed',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($request->hasFile('avatar')) {
+            $disk = config('filesystems.default');
+            if ($user->avatar && \Storage::disk($disk)->exists($user->avatar)) {
+                \Storage::disk($disk)->delete($user->avatar);
+            }
+            $data['avatar'] = $request->file('avatar')->store('avatars', $disk);
+        }
+
         if (empty($data['password'])) {
             unset($data['password']);
         }

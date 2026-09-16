@@ -16,7 +16,13 @@ class LocationController extends Controller{
                 'attendance_start' => 'nullable',
                 'attendance_end' => 'nullable',
                 'attendance_label' => 'nullable|string|max:100',
+                'registration_enabled_students' => 'nullable|boolean',
+                'registration_enabled_teachers' => 'nullable|boolean',
             ]);
+
+            // Handle checkbox values
+            $data['registration_enabled_students'] = $r->has('registration_enabled_students');
+            $data['registration_enabled_teachers'] = $r->has('registration_enabled_teachers');
 
             // Ensure consistent time format H:i:s for Database
             foreach (['attendance_start', 'attendance_end'] as $field) {

@@ -15,6 +15,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'avatar',
         'password',
         'firebase_uid',
         'role',
@@ -52,5 +53,18 @@ class User extends Authenticatable
     public function canScan(): bool
     {
         return $this->role?->canScan() ?? false;
+    }
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (!$this->avatar) return null;
+
+        // If it's a full URL (from Cloudinary), return as is
+        if (filter_var($this->avatar, FILTER_VALIDATE_URL)) {
+            return $this->avatar;
+        }
+
+        // Otherwise return local storage URL
+        return asset('storage/' . $this->avatar);
     }
 }

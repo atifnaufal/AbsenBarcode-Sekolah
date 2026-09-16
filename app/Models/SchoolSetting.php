@@ -17,6 +17,8 @@ class SchoolSetting extends Model
         'attendance_start',
         'attendance_end',
         'attendance_label',
+        'registration_enabled_students',
+        'registration_enabled_teachers',
     ];
 
     protected function casts(): array

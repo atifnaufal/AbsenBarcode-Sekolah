@@ -110,6 +110,33 @@
                     </div>
                 </div>
 
+                <div class="h-px bg-slate-100 my-6"></div>
+
+                {{-- Bagian 3: Kontrol Pendaftaran --}}
+                <div class="space-y-4">
+                    <h3 class="text-sm font-black text-blue-600 uppercase tracking-wider flex items-center gap-2">
+                        <i class="ti ti-user-plus"></i> Kontrol Pendaftaran Mandiri
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="flex items-center justify-between p-4 rounded-2xl border border-school-line bg-slate-50/50 cursor-pointer hover:bg-slate-100 transition">
+                            <div>
+                                <p class="text-xs font-bold text-[#0f1e3d]">Pendaftaran Siswa</p>
+                                <p class="text-[10px] text-slate-500">Izinkan siswa baru mendaftar di halaman login</p>
+                            </div>
+                            <input type="checkbox" name="registration_enabled_students" value="1" {{ $school->registration_enabled_students ? 'checked' : '' }} class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        </label>
+
+                        <label class="flex items-center justify-between p-4 rounded-2xl border border-school-line bg-slate-50/50 cursor-pointer hover:bg-slate-100 transition">
+                            <div>
+                                <p class="text-xs font-bold text-[#0f1e3d]">Pendaftaran Guru</p>
+                                <p class="text-[10px] text-slate-500">Izinkan guru/staf baru mendaftar mandiri</p>
+                            </div>
+                            <input type="checkbox" name="registration_enabled_teachers" value="1" {{ $school->registration_enabled_teachers ? 'checked' : '' }} class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        </label>
+                    </div>
+                </div>
+
                 <div class="pt-4">
                     <button type="submit" class="w-full h-14 rounded-2xl bg-gradient-to-r from-[#0f1e3d] to-[#2c68f5] text-white font-black text-sm shadow-xl shadow-[#0f1e3d]/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
                         <i class="ti ti-device-floppy text-lg"></i> SIMPAN PERUBAHAN CONFIG

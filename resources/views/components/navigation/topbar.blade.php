@@ -13,8 +13,12 @@
                 <span class="h-2 w-2 rounded-full bg-school-success" aria-hidden="true"></span>
                 Server tersambung
             </div>
-            <div class="grid h-8 w-8 place-items-center rounded-full bg-[#e9e4ff] text-xs font-bold text-school-purple">
-                {{ str($activeUser->name ?? auth()->user()?->name ?? 'AS')->substr(0, 2)->upper() }}
+            <div class="grid h-8 w-8 place-items-center rounded-full bg-[#e9e4ff] text-xs font-bold text-school-purple overflow-hidden border border-school-line">
+                @if(auth()->user()->avatar_url)
+                    <img src="{{ auth()->user()->avatar_url }}" class="h-full w-full object-cover">
+                @else
+                    {{ str($activeUser->name ?? auth()->user()?->name ?? 'AS')->substr(0, 2)->upper() }}
+                @endif
             </div>
             <details class="relative xl:hidden">
                 <summary class="grid h-9 w-9 cursor-pointer list-none place-items-center rounded-school-control border border-school-line text-school-muted hover:bg-school-canvas" aria-label="Buka menu navigasi">
