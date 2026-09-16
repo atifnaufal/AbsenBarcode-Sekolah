@@ -65,15 +65,17 @@ class StudentDashboardController extends Controller
                     $query->where('result', AttendanceResult::SUCCESS->value)
                           ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth]);
                 }])
-                ->withAvg(['attendances as avg_arrival_time' => function ($query) use ($startOfMonth, $endOfMonth) {
-                    $query->where('result', AttendanceResult::SUCCESS->value)
-                          ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth]);
-                }], 'scanned_at')
-                ->orderBy('avg_arrival_time', 'asc')
+                ->orderBy('attendances_count', 'desc')
                 ->limit(5)
                 ->get()
-                ->map(function($u) {
-                    $u->formatted_avg_time = $u->avg_arrival_time ? \Carbon\Carbon::parse($u->avg_arrival_time)->format('H:i') : '--:--';
+                ->map(function($u) use ($startOfMonth, $endOfMonth) {
+                    $avgSeconds = $u->attendances()
+                        ->where('result', AttendanceResult::SUCCESS->value)
+                        ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth])
+                        ->get()
+                        ->avg(fn($a) => $a->scanned_at->diffInSeconds($a->scanned_at->copy()->startOfDay()));
+
+                    $u->formatted_avg_time = $avgSeconds ? now()->startOfDay()->addSeconds($avgSeconds)->format('H:i') : '--:--';
                     return $u;
                 });
         }

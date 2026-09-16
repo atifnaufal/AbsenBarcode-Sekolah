@@ -192,15 +192,13 @@
                         </div>
                     </div>
 
-                    <div class="mt-6 pt-6 border-t border-white/10">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-xs text-white/60">Persentase Kehadiran Sekolah Hari Ini</span>
-                            <span class="text-xs font-black text-[#ffd500] font-mono">{{ $summary['percentage'] }}%</span>
+                            <span class="text-xs font-black text-[#ffd500] font-mono" x-text="'{{ $summary['percentage'] }}'">0%</span>
                         </div>
                         <div class="h-2.5 w-full bg-white/10 rounded-full overflow-hidden p-0.5 border border-white/5">
-                            <div class="h-full bg-gradient-to-r from-blue-400 via-indigo-400 to-green-400 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(52,211,153,0.5)]" style="width: {{ $summary['percentage'] }}%"></div>
+                            <div class="h-full bg-gradient-to-r from-blue-400 via-indigo-400 to-green-400 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(52,211,153,0.5)]" style="width: {{ $summary['percentage'] }}"></div>
                         </div>
-                    </div>
                 </div>
 
                 {{-- School Profile Information Card Container --}}

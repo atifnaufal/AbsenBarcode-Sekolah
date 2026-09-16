@@ -53,16 +53,18 @@ class AdminDashboardController extends Controller
                 $query->where('result', AttendanceResult::SUCCESS->value)
                       ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth]);
             }])
-            ->withAvg(['attendances as avg_arrival_time' => function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->where('result', AttendanceResult::SUCCESS->value)
-                      ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth]);
-            }], 'scanned_at')
-            ->orderBy('avg_arrival_time', 'asc') // Earliest average time wins
+            ->orderBy('attendances_count', 'desc') // Rank by most active first
             ->limit(5)
             ->get()
-            ->map(function($user) {
-                // Convert avg_arrival_time (which might be a string timestamp) to a clean time format
-                $user->formatted_avg_time = $user->avg_arrival_time ? \Carbon\Carbon::parse($user->avg_arrival_time)->format('H:i') : '--:--';
+            ->map(function($user) use ($startOfMonth, $endOfMonth) {
+                // Safely calculate average time in PHP to avoid PostgreSQL AVG(timestamp) errors
+                $avgSeconds = $user->attendances()
+                    ->where('result', AttendanceResult::SUCCESS->value)
+                    ->whereBetween('scanned_at', [$startOfMonth, $endOfMonth])
+                    ->get()
+                    ->avg(fn($a) => $a->scanned_at->diffInSeconds($a->scanned_at->copy()->startOfDay()));
+
+                $user->formatted_avg_time = $avgSeconds ? now()->startOfDay()->addSeconds($avgSeconds)->format('H:i') : '--:--';
                 return $user;
             });
 
