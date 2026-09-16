@@ -30,6 +30,7 @@
                         <th scope="col" class="pb-2 font-semibold">ID / kelas</th>
                         <th scope="col" class="pb-2 font-semibold">Waktu</th>
                         <th scope="col" class="pb-2 font-semibold">Hasil validasi</th>
+                        <th scope="col" class="pb-2 font-semibold text-right">Aksi</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-[#edf0f5]">
@@ -40,20 +41,36 @@
                                 'success' => 'text-school-success',
                                 'outside_area' => 'text-school-danger',
                                 'expired' => 'text-school-warning',
+                                'late' => 'text-orange-500',
                                 default => 'text-school-muted',
                             };
-                            $resultIcon = match ($result) {
-                                'success' => 'ti-circle-check',
-                                'outside_area' => 'ti-map-pin-off',
-                                'expired' => 'ti-clock-x',
-                                default => 'ti-rotate-2',
-                            };
                         @endphp
-                        <tr class="hover:bg-school-canvas/60">
+                        <tr class="hover:bg-school-canvas/60 group">
                             <td class="py-3 font-semibold">{{ $scan->user->name }}</td>
-                            <td class="py-3 text-school-muted">{{ $scan->user->identifier }} · {{ $scan->user->class_name ?? 'Guru' }}</td>
+                            <td class="py-3 text-school-muted">{{ $scan->user->identifier }} · {{ $scan->user->class_name ?? 'Staf' }}</td>
                             <td class="py-3 tabular-nums text-school-muted">{{ AttendancePresenter::time($scan->scanned_at, $school->timezone) }}</td>
-                            <td class="py-3"><span class="inline-flex items-center gap-1.5 font-semibold {{ $resultClass }}"><i class="ti {{ $resultIcon }}" aria-hidden="true"></i>{{ AttendancePresenter::result($scan->result) }}</span></td>
+                            <td class="py-3">
+                                <span class="inline-flex items-center gap-1.5 font-bold {{ $resultClass }}">
+                                    {{ AttendancePresenter::result($scan->result) }}
+                                </span>
+                            </td>
+                            <td class="py-3 text-right">
+                                <div class="inline-flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    {{-- Quick Toggle to Success if it was failed --}}
+                                    @if($scan->result->value !== 'success')
+                                    <form action="{{ route('admin.attendances.update', $scan) }}" method="POST">
+                                        @csrf @method('PUT')
+                                        <input type="hidden" name="result" value="success">
+                                        <button type="submit" class="text-[10px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">Sahkan</button>
+                                    </form>
+                                    @endif
+
+                                    <form action="{{ route('admin.attendances.destroy', $scan) }}" method="POST" onsubmit="return confirm('Hapus permanen log ini?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="text-[10px] font-black uppercase text-red-600 bg-red-50 px-2 py-1 rounded-md border border-red-100">Hapus</button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>

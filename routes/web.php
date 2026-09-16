@@ -48,6 +48,10 @@ Route::middleware(['auth', 'role:admin_sekolah'])->group(function () {
         Route::get('/lokasi', [LocationController::class,'edit'])->name('location.edit');
         Route::put('/lokasi', [LocationController::class,'update'])->name('location.update');
 
+        // NEW: Attendance CRUD for Admin
+        Route::put('/attendances/{attendance}', [\App\Http\Controllers\Admin\AttendanceController::class, 'update'])->name('attendances.update');
+        Route::delete('/attendances/{attendance}', [\App\Http\Controllers\Admin\AttendanceController::class, 'destroy'])->name('attendances.destroy');
+
         // NEW: Schedule Management
         Route::get('/schedules', [\App\Http\Controllers\Admin\ScheduleController::class, 'index'])->name('schedules.index');
         Route::post('/schedules', [\App\Http\Controllers\Admin\ScheduleController::class, 'store'])->name('schedules.store');

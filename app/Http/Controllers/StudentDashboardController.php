@@ -157,21 +157,20 @@ class StudentDashboardController extends Controller
     {
         $start = now($school->timezone)->startOfMonth();
         $today = now($school->timezone);
-        $workDays = 0;
 
-        // Loop through days from start of month until yesterday
-        for ($date = $start->copy(); $date->lt($today); $date->addDay()) {
-            // Only count Monday to Saturday (Assume Sunday is holiday)
-            if (!$date->isSunday()) {
-                $workDays++;
-            }
-        }
+        // ✅ NEW LOGIC: Only count days where at least one person scanned in the system
+        // This prevents counting holidays or days before the app was launched as "Alfa"
+        $systemActiveDays = Attendance::query()
+            ->whereBetween('attendance_date', [$start->toDateString(), $today->toDateString()])
+            ->distinct()
+            ->pluck('attendance_date')
+            ->count();
 
-        $attendancesCount = Attendance::where('user_id', $user->id)
-            ->whereBetween('attendance_date', [$start->toDateString(), $today->subDay()->toDateString()])
+        $userAttendancesCount = Attendance::where('user_id', $user->id)
+            ->whereBetween('attendance_date', [$start->toDateString(), $today->toDateString()])
             ->where('result', AttendanceResult::SUCCESS)
             ->count();
 
-        return max(0, $workDays - $attendancesCount);
+        return max(0, $systemActiveDays - $userAttendancesCount);
     }
 }
