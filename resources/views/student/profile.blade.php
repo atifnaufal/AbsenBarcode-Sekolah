@@ -54,6 +54,58 @@
             </div>
         </div>
 
+        {{-- NEW: Interactive FAQ Section --}}
+        <div class="bg-white rounded-[32px] p-6 shadow-xl border border-white mb-6" x-data="{ openFaq: null }">
+            <h3 class="text-[10px] font-black text-[#2c68f5] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                <i class="ti ti-help-circle text-sm"></i> Pusat Bantuan & FAQ
+            </h3>
+
+            <div class="divide-y divide-slate-50">
+                {{-- FAQ 1 --}}
+                <div class="py-3">
+                    <button @click="openFaq = (openFaq === 1 ? null : 1)" class="w-full flex items-center justify-between text-left group">
+                        <span class="text-xs font-bold text-[#0f1e3d] group-hover:text-[#2c68f5] transition-colors">Bagaimana cara absen yang benar?</span>
+                        <i class="ti text-[#94a3b8] transition-transform duration-300" :class="openFaq === 1 ? 'ti-chevron-up rotate-180 text-[#2c68f5]' : 'ti-chevron-down'"></i>
+                    </button>
+                    <div x-show="openFaq === 1" x-collapse x-cloak class="mt-2 text-[11px] text-[#64748b] leading-relaxed">
+                        Pastikan GPS perangkat aktif, berikan izin lokasi di browser, dan arahkan kamera ke QR Code yang tampil di Monitor Sekolah. Pastikan Anda berada dalam radius aman sekolah.
+                    </div>
+                </div>
+
+                {{-- FAQ 2 --}}
+                <div class="py-3">
+                    <button @click="openFaq = (openFaq === 2 ? null : 2)" class="w-full flex items-center justify-between text-left group">
+                        <span class="text-xs font-bold text-[#0f1e3d] group-hover:text-[#2c68f5] transition-colors">Kenapa lokasi saya tidak terbaca?</span>
+                        <i class="ti text-[#94a3b8] transition-transform duration-300" :class="openFaq === 2 ? 'ti-chevron-up rotate-180 text-[#2c68f5]' : 'ti-chevron-down'"></i>
+                    </button>
+                    <div x-show="openFaq === 2" x-collapse x-cloak class="mt-2 text-[11px] text-[#64748b] leading-relaxed">
+                        Hal ini biasanya terjadi karena izin lokasi diblokir atau GPS tidak akurat. Coba muat ulang halaman, pastikan anda tidak menggunakan VPN, dan berada di area terbuka untuk akurasi GPS maksimal.
+                    </div>
+                </div>
+
+                {{-- FAQ 3 --}}
+                <div class="py-3">
+                    <button @click="openFaq = (openFaq === 3 ? null : 3)" class="w-full flex items-center justify-between text-left group">
+                        <span class="text-xs font-bold text-[#0f1e3d] group-hover:text-[#2c68f5] transition-colors">Mengapa QR Code tidak muncul?</span>
+                        <i class="ti text-[#94a3b8] transition-transform duration-300" :class="openFaq === 3 ? 'ti-chevron-up rotate-180 text-[#2c68f5]' : 'ti-chevron-down'"></i>
+                    </button>
+                    <div x-show="openFaq === 3" x-collapse x-cloak class="mt-2 text-[11px] text-[#64748b] leading-relaxed">
+                        Monitor hanya menampilkan QR Code pada jam operasional yang telah ditentukan sekolah. Jika di luar jadwal, sistem akan otomatis menutup akses absensi.
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-50 flex items-center gap-3">
+                <div class="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                    <i class="ti ti-brand-whatsapp text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-[#0f1e3d]">Butuh Bantuan Lain?</p>
+                    <p class="text-[9px] text-[#94a3b8] font-bold uppercase tracking-tighter">Hubungi Admin IT Sekolah</p>
+                </div>
+            </div>
+        </div>
+
         {{-- Form Section --}}
         <form method="POST" action="{{ route('student.profile.update') }}" @submit="handleSubmit" class="space-y-6">
             @csrf @method('PUT')
