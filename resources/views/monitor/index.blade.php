@@ -150,14 +150,14 @@
                         <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
                             <p class="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Hadir Hari Ini</p>
                             <div class="flex items-end justify-between">
-                                <h4 class="text-2xl font-black font-display text-white leading-none" x-text="summary.percentage + '%'">0%</h4>
+                                <h4 class="text-2xl font-black font-display text-white leading-none" x-text="summary.percentage">0%</h4>
                                 <p class="text-[9px] font-bold text-emerald-400 mb-0.5" x-text="summary.present + ' Users'"></p>
                             </div>
                         </div>
                         <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex flex-col justify-center">
                             <p class="text-[9px] font-black text-white/30 uppercase tracking-widest mb-2">School Progress</p>
                             <div class="w-full bg-white/10 h-1 rounded-full overflow-hidden">
-                                <div class="h-full bg-gradient-to-r from-[#2c68f5] to-emerald-400 rounded-full transition-all duration-1000" :style="`width: ${summary.percentage}%`"></div>
+                                <div class="h-full bg-gradient-to-r from-[#2c68f5] to-emerald-400 rounded-full transition-all duration-1000" :style="`width: ${summary.percentage}`"></div>
                             </div>
                         </div>
                     </div>
