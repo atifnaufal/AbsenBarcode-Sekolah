@@ -29,10 +29,11 @@ class MonitorController extends Controller
             'activeQr' => $token ? $this->tokens->payload($token) : null,
             'summary' => $this->summary($school),
             'isClosed' => $isClosed,
+            'hideNav' => true, // ✅ NEW: Hide Admin Sidebar/Topbar on Monitor
             'schedule' => [
                 'start' => $school->attendance_start,
                 'end' => $school->attendance_end,
-                'label' => $school->attendance_label,
+                'label' => $school->attendance_label ?? 'Absensi',
             ]
         ]);
     }
@@ -49,9 +50,14 @@ class MonitorController extends Controller
 
     private function isScheduleClosed(SchoolSetting $school): bool
     {
-        if (!$school->attendance_start || !$school->attendance_end) return false;
+        // ✅ NEW: QR ONLY appears if start AND end time are set.
+        if (empty($school->attendance_start) || empty($school->attendance_end)) {
+            return true;
+        }
 
         $now = now($school->timezone)->format('H:i:s');
+
+        // If current time is outside the window, it's closed.
         return $now < $school->attendance_start || $now > $school->attendance_end;
     }
 
