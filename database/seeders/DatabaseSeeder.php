@@ -11,16 +11,16 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        SchoolSetting::query()->updateOrCreate(
-            ['name' => 'SMK BINA UTAMA KENDAL'],
-            [
-                'address' => 'Koordinat demo — ganti sebelum produksi',
+        if (SchoolSetting::query()->count() === 0) {
+            SchoolSetting::query()->create([
+                'name' => 'SMK BINA UTAMA KENDAL',
+                'address' => 'Jl. Raya Utama, Kabupaten Kendal',
                 'latitude' => -6.9182000,
                 'longitude' => 110.2056000,
                 'radius_meters' => 80,
                 'timezone' => 'Asia/Jakarta',
-            ],
-        );
+            ]);
+        }
 
         User::query()->updateOrCreate(
             ['email' => 'adminsekolah@example.test'],

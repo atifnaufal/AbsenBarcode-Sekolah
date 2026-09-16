@@ -9,11 +9,13 @@ export function monitorCountdown({ initial = {}, refreshUrl = '', isClosed = fal
         scheduleCheckTimer: null,
         isClosed: isClosed,
         label: label,
-        scans: [], // ✅ NEW: Re-integrated reactivity for logs
-        summary: { percentage: 0, present: 0 }, // ✅ NEW: Re-integrated summary
+        scans: [],
+        summary: { percentage: '0%', present: 0 },
 
         init() {
             if (this.isClosed) {
+                this.scans = [];
+                this.summary = { percentage: '0%', present: 0 };
                 this.startScheduleCheck();
                 return;
             }
@@ -24,10 +26,16 @@ export function monitorCountdown({ initial = {}, refreshUrl = '', isClosed = fal
         destroy() {
             window.clearInterval(this.refreshTimer);
             window.clearInterval(this.scheduleCheckTimer);
+            window.clearInterval(this.pollTimer);
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
         },
 
         tick() {
-            if (this.isClosed) return;
+            if (this.isClosed) {
+                this.scans = [];
+                if ('speechSynthesis' in window) speechSynthesis.cancel();
+                return;
+            }
             if (this.seconds <= 0) {
                 this.refresh();
                 return;
@@ -37,7 +45,7 @@ export function monitorCountdown({ initial = {}, refreshUrl = '', isClosed = fal
         },
 
         startScheduleCheck() {
-            this.scheduleCheckTimer = window.setInterval(() => this.checkSchedule(), 30000);
+            this.scheduleCheckTimer = window.setInterval(() => this.checkSchedule(), 20000);
         },
 
         async checkSchedule() {
@@ -49,6 +57,7 @@ export function monitorCountdown({ initial = {}, refreshUrl = '', isClosed = fal
                 });
                 if (!response.ok) return;
                 const payload = await response.json();
+
                 if (!payload.is_closed && payload.qr) {
                     window.clearInterval(this.scheduleCheckTimer);
                     this.isClosed = false;
@@ -56,6 +65,10 @@ export function monitorCountdown({ initial = {}, refreshUrl = '', isClosed = fal
                     this.seconds = Math.floor(Number(payload.qr.countdown_seconds ?? this.ttl));
                     this.renderSeconds();
                     this.refreshTimer = window.setInterval(() => this.tick(), 1000);
+                    this.pollScans(true);
+                } else {
+                    this.scans = [];
+                    if ('speechSynthesis' in window) speechSynthesis.cancel();
                 }
             } catch (e) { /* ignore */ }
         },
@@ -81,7 +94,10 @@ export function monitorCountdown({ initial = {}, refreshUrl = '', isClosed = fal
 
                 if (payload.is_closed) {
                     this.isClosed = true;
+                    this.scans = [];
                     window.clearInterval(this.refreshTimer);
+                    if ('speechSynthesis' in window) speechSynthesis.cancel();
+                    this.startScheduleCheck();
                     return;
                 }
 
@@ -106,29 +122,48 @@ export function monitorCountdown({ initial = {}, refreshUrl = '', isClosed = fal
 
         // poll recent scans + voice
         recentUrl: '',
-        lastScanAt: 0,
+        lastScanAt: -1,
         pollTimer: null,
-        startPoll(url) { this.recentUrl = url; this.pollTimer = setInterval(()=>this.pollScans(), 3000); window.addEventListener('storage', e=>{ if(e.key==='last_scan') this.handleScan(JSON.parse(e.newValue)) }); },
-        async pollScans(){
+        startPoll(url) {
+            this.recentUrl = url;
+            this.pollTimer = setInterval(()=>this.pollScans(), 3000);
+            this.pollScans(true);
+        },
+        async pollScans(silent = false){
             if(!this.recentUrl) return;
+            if (this.isClosed) {
+                this.scans = [];
+                return;
+            }
+
             try{
                 const r=await fetch(this.recentUrl,{headers:{Accept:'application/json'},credentials:'same-origin'});
                 if(!r.ok) return;
                 const j=await r.json();
 
-                // ✅ Update local Alpine state for premium monitor UI
                 this.scans = j.scans || [];
-                this.summary = j.summary || { percentage: 0, present: 0 };
+                this.summary = j.summary || { percentage: '0%', present: 0 };
 
                 const latest=this.scans[0];
-                if(latest && latest.id!==this.lastScanAt){
-                    this.lastScanAt=latest.id;
-                    this.$dispatch('scan-received',{scan:latest});
-                    this.speak(`Selamat Datang ${latest.name}, Berhasil.`);
+                if(latest){
+                    if (this.lastScanAt === -1) {
+                        this.lastScanAt = latest.id;
+                    } else if (latest.id !== this.lastScanAt) {
+                        this.lastScanAt = latest.id;
+                        if (!silent) {
+                            this.speak(`Selamat Datang ${latest.name}, Berhasil.`);
+                        }
+                    }
                 }
             }catch(e){}
         },
-        handleScan(d){ if(!d) return; this.speak(`Selamat Datang ${d.name}, NISN ${d.identifier}, pukul ${d.time}, Berhasil`); },
-        speak(t){ if(!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='id-ID'; u.rate=0.95; speechSynthesis.speak(u); },
+        speak(t){
+            if(!('speechSynthesis' in window) || this.isClosed) return;
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(t);
+            u.lang = 'id-ID';
+            u.rate = 0.95;
+            speechSynthesis.speak(u);
+        },
     };
 }
