@@ -1,6 +1,15 @@
 @extends('layouts.app')
 @section('content')
-<div class="min-h-screen bg-[#f8fafd] text-[#0f172a] font-sans" x-data="profilePage()">
+<div class="min-h-screen bg-[#f8fafd] text-[#0f172a] font-sans relative" x-data="profilePage()">
+
+    {{-- Global Loading Overlay for Logout --}}
+    <div x-show="isLoggingOut" x-transition.opacity class="fixed inset-0 z-[100] bg-[#0f1e3d]/90 backdrop-blur-lg flex flex-col items-center justify-center text-white" style="display: none;">
+        <div class="h-20 w-20 rounded-3xl bg-white/10 flex items-center justify-center mb-4 shadow-2xl border border-white/20">
+            <i class="ti ti-loader-2 animate-spin text-4xl text-[#ffd500]"></i>
+        </div>
+        <p class="text-sm font-black uppercase tracking-[0.2em] text-[#ffd500]">Menghancurkan Sesi...</p>
+        <p class="text-[10px] font-bold opacity-60 mt-2">Sedang keluar dengan aman</p>
+    </div>
 
     {{-- Top Header Section --}}
     <div class="fixed top-0 left-0 w-full h-[180px] bg-gradient-to-br from-[#0f1e3d] via-[#1a3a7a] to-[#2c68f5] rounded-b-[40px] shadow-2xl z-0"></div>
@@ -85,19 +94,19 @@
             </div>
 
             <div class="grid grid-cols-1 gap-4">
-                <button type="submit" class="w-full h-14 bg-gradient-to-r from-[#2c68f5] to-[#1a3a7a] text-white font-black text-sm rounded-[24px] shadow-xl shadow-[#2c68f5]/25 flex items-center justify-center gap-2" :disabled="isSubmitting">
+                <button type="submit" class="w-full h-14 bg-gradient-to-r from-[#2c68f5] to-[#1a3a7a] text-white font-black text-sm rounded-[24px] shadow-xl shadow-[#2c68f5]/25 flex items-center justify-center gap-2" :disabled="isSubmitting || isLoggingOut">
                     <i class="ti" :class="isSubmitting ? 'ti-loader animate-spin' : 'ti-device-floppy'"></i>
                     <span x-text="isSubmitting ? 'Memproses...' : 'Simpan Perubahan'"></span>
                 </button>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="w-full h-14 bg-white border border-[#e2e8f0] text-red-500 font-black text-sm rounded-[24px] shadow-md flex items-center justify-center gap-2">
-                        <i class="ti ti-logout"></i>
-                        Logout & Keluar
-                    </button>
-                </form>
             </div>
+        </form>
+
+        <form method="POST" action="{{ route('logout') }}" id="logoutForm" @submit.prevent="confirmLogout">
+            @csrf
+            <button type="submit" class="w-full h-14 bg-white border border-red-100 text-red-500 font-black text-sm rounded-[24px] shadow-lg flex items-center justify-center gap-2 mt-4 transition active:scale-95 hover:bg-red-50" :disabled="isSubmitting || isLoggingOut">
+                <i class="ti ti-logout-2 text-xl"></i>
+                Logout & Keluar Aplikasi
+            </button>
         </form>
     </div>
 
@@ -121,7 +130,18 @@
 function profilePage() {
     return {
         isSubmitting: false,
-        handleSubmit() { this.isSubmitting = true; }
+        isLoggingOut: false,
+        handleSubmit() {
+            this.isSubmitting = true;
+        },
+        confirmLogout() {
+            if (confirm('Apakah Anda yakin ingin mengakhiri sesi dan keluar dari sistem absensi?')) {
+                this.isLoggingOut = true;
+                setTimeout(() => {
+                    document.getElementById('logoutForm').submit();
+                }, 1000);
+            }
+        }
     }
 }
 </script>
