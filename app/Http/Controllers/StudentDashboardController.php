@@ -105,28 +105,39 @@ class StudentDashboardController extends Controller
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
-        $data = $request->validate([
+
+        $rules = [
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6|confirmed',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        ];
 
+        $data = $request->validate($rules);
+
+        // ✅ FIX: Only update avatar if a new file is actually uploaded
         if ($request->hasFile('avatar')) {
-            $disk = config('filesystems.default');
+            $disk = config('filesystems.default') === 'cloudinary' ? 'cloudinary' : 'public';
+
+            // Delete old avatar if exists
             if ($user->avatar && \Storage::disk($disk)->exists($user->avatar)) {
                 \Storage::disk($disk)->delete($user->avatar);
             }
+
             $data['avatar'] = $request->file('avatar')->store('avatars', $disk);
+        } else {
+            // Remove avatar from data array so it doesn't overwrite existing value with null
+            unset($data['avatar']);
         }
 
         if (empty($data['password'])) {
             unset($data['password']);
+        } else {
+            $data['password'] = \Hash::make($data['password']);
         }
 
         $user->update($data);
 
-        // If password was updated, refresh the session hash to prevent logout
         if (isset($data['password'])) {
             auth()->login($user);
         }

@@ -132,24 +132,26 @@
                     {{-- Avatar Upload --}}
                     <div class="flex flex-col items-center justify-center pb-4">
                         <div class="relative group cursor-pointer" @click="$refs.avatarInput.click()">
-                            <div class="h-20 w-20 rounded-2xl bg-slate-100 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden">
+                            <div class="h-24 w-24 rounded-[32px] bg-slate-50 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden">
                                 <template x-if="!avatarPreview">
-                                    @if(auth()->user()->avatar)
-                                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="h-full w-full object-cover">
+                                    @if(auth()->user()->avatar_url)
+                                        <img src="{{ auth()->user()->avatar_url }}" class="h-full w-full object-cover">
                                     @else
-                                        <i class="ti ti-camera text-2xl text-slate-300"></i>
+                                        <div class="flex flex-col items-center text-slate-300">
+                                            <i class="ti ti-photo text-2xl"></i>
+                                        </div>
                                     @endif
                                 </template>
                                 <template x-if="avatarPreview">
                                     <img :src="avatarPreview" class="h-full w-full object-cover">
                                 </template>
                             </div>
-                            <div class="absolute -bottom-1 -right-1 h-6 w-6 rounded-lg bg-[#2c68f5] text-white flex items-center justify-center shadow-lg border-2 border-white">
-                                <i class="ti ti-plus text-[10px]"></i>
+                            <div class="absolute -bottom-1 -right-1 h-8 w-8 rounded-2xl bg-[#ffd500] text-[#0f1e3d] flex items-center justify-center shadow-lg border-4 border-white">
+                                <i class="ti ti-camera-plus text-sm"></i>
                             </div>
                         </div>
                         <input type="file" name="avatar" x-ref="avatarInput" class="hidden" accept="image/*" @change="handleAvatarChange">
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2">Ketuk untuk Ganti Foto</p>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">Ketuk untuk Ganti Foto</p>
                     </div>
 
                     <div class="space-y-2">
