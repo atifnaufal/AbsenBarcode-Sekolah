@@ -50,6 +50,13 @@ class StudentDashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // NEW: Fetch Current Active Schedule/Agenda
+        $currentTime = now($school->timezone)->format('H:i:s');
+        $activeAgenda = \App\Models\SchoolSchedule::where('active', true)
+            ->where('start_time', '<=', $currentTime)
+            ->where('end_time', '>=', $currentTime)
+            ->first();
+
         $teacherRankings = collect();
         if ($user->role === UserRole::GURU) {
             $startOfMonth = now($school->timezone)->startOfMonth();
@@ -81,7 +88,7 @@ class StudentDashboardController extends Controller
                 });
         }
 
-        return view('student.dashboard', compact('user', 'school', 'stats', 'recentScans', 'teacherRankings'))
+        return view('student.dashboard', compact('user', 'school', 'stats', 'recentScans', 'teacherRankings', 'activeAgenda'))
             ->with('hideNav', true);
     }
 

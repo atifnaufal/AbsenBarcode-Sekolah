@@ -15,13 +15,41 @@
                 <p class="text-xs font-medium opacity-80 mt-0.5">{{ auth()->user()->role?->label() }} · {{ auth()->user()->class_name ?? 'Staf Sekolah' }}</p>
             </div>
             <div class="relative">
-                <div class="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-1 shadow-xl">
-                    <div class="h-full w-full rounded-xl bg-gradient-to-tr from-[#ffd500] to-[#ff9900] flex items-center justify-center font-display font-black text-lg text-[#0f1e3d]">
-                        {{ str(auth()->user()->name)->substr(0,1)->upper() }}
+                {{-- NEW: Professional Dynamic Analog-Clock Style Clock --}}
+                <div class="h-16 w-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 p-1 shadow-xl flex items-center justify-center relative overflow-hidden" x-data="clockWidget()" x-init="start()">
+                    <div class="text-center">
+                        <p class="text-[12px] font-black leading-none text-[#ffd500]" x-text="time.split(':')[0] + ':' + time.split(':')[1]"></p>
+                        <p class="text-[8px] font-bold text-white uppercase tracking-tighter mt-0.5" x-text="seconds"></p>
+                    </div>
+                    {{-- Small decorative ticks --}}
+                    <div class="absolute inset-0 opacity-20 pointer-events-none">
+                        <div class="absolute top-1 left-1/2 -translate-x-1/2 h-1 w-0.5 bg-white"></div>
+                        <div class="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-0.5 bg-white"></div>
+                        <div class="absolute left-1 top-1/2 -translate-y-1/2 w-1 h-0.5 bg-white"></div>
+                        <div class="absolute right-1 top-1/2 -translate-y-1/2 w-1 h-0.5 bg-white"></div>
                     </div>
                 </div>
             </div>
         </header>
+
+        {{-- NEW: Live Agenda Notification Banner --}}
+        @if(isset($activeAgenda))
+        <div class="mb-6 animate-[slideIn_.5s_ease-out]">
+            <div class="bg-gradient-to-r from-emerald-500/20 to-teal-500/10 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-3.5 flex items-center gap-3">
+                <div class="h-9 w-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-lg shadow-lg shadow-emerald-500/20">
+                    <i class="ti ti-bell-ringing animate-bounce"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-[9px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-1">Agenda Sekolah Aktif</p>
+                    <h4 class="text-xs font-bold text-white truncate">{{ $activeAgenda->label }}</h4>
+                </div>
+                <div class="text-right">
+                    <p class="text-[9px] font-black text-white/40 uppercase tracking-tighter">Berakhir</p>
+                    <p class="text-[10px] font-black text-[#ffd500] font-mono">{{ substr($activeAgenda->end_time, 0, 5) }}</p>
+                </div>
+            </div>
+        </div>
+        @endif
 
         {{-- Main Action Hub: Scan QR --}}
         <div class="group relative mb-8">
@@ -173,6 +201,22 @@
 <script>
     function attendanceDashboard() {
         return {}
+    }
+
+    function clockWidget() {
+        return {
+            time: '',
+            seconds: '',
+            start() {
+                this.update();
+                setInterval(() => this.update(), 1000);
+            },
+            update() {
+                const now = new Date();
+                this.time = now.toTimeString().split(' ')[0];
+                this.seconds = now.getSeconds().toString().padStart(2, '0') + ' DETIK';
+            }
+        }
     }
 </script>
 @endsection

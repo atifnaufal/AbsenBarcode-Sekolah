@@ -47,6 +47,12 @@ Route::middleware(['auth', 'role:admin_sekolah'])->group(function () {
         Route::get('/laporan/export', [ReportController::class,'export'])->name('reports.export');
         Route::get('/lokasi', [LocationController::class,'edit'])->name('location.edit');
         Route::put('/lokasi', [LocationController::class,'update'])->name('location.update');
+
+        // NEW: Schedule Management
+        Route::get('/schedules', [\App\Http\Controllers\Admin\ScheduleController::class, 'index'])->name('schedules.index');
+        Route::post('/schedules', [\App\Http\Controllers\Admin\ScheduleController::class, 'store'])->name('schedules.store');
+        Route::put('/schedules/{schedule}', [\App\Http\Controllers\Admin\ScheduleController::class, 'update'])->name('schedules.update');
+        Route::delete('/schedules/{schedule}', [\App\Http\Controllers\Admin\ScheduleController::class, 'destroy'])->name('schedules.destroy');
     });
 });
 
