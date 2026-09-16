@@ -115,10 +115,6 @@
                     <i class="ti ti-camera text-sm"></i>
                     <span x-text="scannerState === 'scanning' ? 'Radar Kamera Aktif' : 'Aktifkan Kamera Pemindai'"></span>
                 </button>
-
-                <button type="button" @click="useDemoToken" class="w-full h-10 bg-white/5 border border-white/10 text-white text-xs font-semibold rounded-xl hover:bg-white/10 transition">
-                    Gunakan Kode Token Demo Kehadiran
-                </button>
             </div>
         </div>
 
