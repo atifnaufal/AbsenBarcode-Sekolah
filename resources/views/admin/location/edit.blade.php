@@ -28,6 +28,26 @@
     </div>
     @endif
 
+    @if(session('error') || $errors->any())
+    <div class="mb-6 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-800 font-medium shadow-sm">
+        <div class="flex items-start gap-2">
+            <i class="ti ti-alert-circle text-red-600 text-lg mt-0.5"></i>
+            <div class="flex-1">
+                <p class="font-bold">Konfigurasi Gagal Disimpan:</p>
+                <ul class="mt-1 list-disc list-inside text-xs space-y-1">
+                    @if(session('error'))
+                        <li>{{ session('error') }}</li>
+                    @endif
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            <button @click="$el.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700"><i class="ti ti-x"></i></button>
+        </div>
+    </div>
+    @endif
+
     <div class="grid gap-6 lg:grid-cols-[1fr_400px]">
         {{-- Form Configuration Card --}}
         <div class="relative overflow-hidden rounded-3xl bg-white border border-school-line shadow-sm p-6 sm:p-8">
