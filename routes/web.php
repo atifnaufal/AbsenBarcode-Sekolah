@@ -37,6 +37,7 @@ Route::middleware(['auth', 'role:admin_sekolah'])->group(function () {
     Route::get('/monitor/recent', [MonitorController::class, 'recentScans'])->name('monitor.recent');
     Route::prefix('admin')->name('admin.')->group(function(){
         Route::get('/{role}/users', [UserController::class,'index'])->whereIn('role',['siswa','guru'])->name('users.index');
+        Route::post('/{role}/users/toggle-registration', [UserController::class,'toggleRegistration'])->name('users.toggle-registration');
         Route::get('/{role}/users/create', [UserController::class,'create'])->name('users.create');
         Route::post('/{role}/users', [UserController::class,'store'])->name('users.store');
         Route::get('/{role}/users/{user}/edit', [UserController::class,'edit'])->name('users.edit');

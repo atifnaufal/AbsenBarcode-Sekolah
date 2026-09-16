@@ -15,16 +15,42 @@
     </div>
 
     {{-- Filter Search Box --}}
-    <div class="bg-white rounded-2xl border border-school-line p-4 shadow-sm mb-6">
-        <form class="flex flex-col sm:flex-row gap-3">
-            <div class="relative flex-1">
-                <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#8a95a8]"></i>
-                <input name="q" value="{{ $q }}" placeholder="Cari berdasarkan nama lengkap, NISN/NIP, atau alamat email..." class="w-full h-11 pl-11 pr-4 rounded-xl border border-school-line text-sm text-[#172033] focus:border-[#2c68f5] focus:outline-none transition">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-school-line p-4 shadow-sm">
+            <form class="flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-1">
+                    <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#8a95a8]"></i>
+                    <input name="q" value="{{ $q }}" placeholder="Cari berdasarkan nama lengkap, NISN/NIP, atau alamat email..." class="w-full h-11 pl-11 pr-4 rounded-xl border border-school-line text-sm text-[#172033] focus:border-[#2c68f5] focus:outline-none transition">
+                </div>
+                <button class="h-11 px-6 rounded-xl bg-[#0f1e3d] text-xs font-bold text-white hover:bg-[#1a2d52] transition">
+                    Cari Data
+                </button>
+            </form>
+        </div>
+
+        {{-- NEW: Registration Toggle Card --}}
+        <div class="bg-white rounded-2xl border border-school-line p-4 shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-xl bg-blue-50 text-[#2c68f5] flex items-center justify-center text-xl">
+                    <i class="ti ti-user-plus"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-[#64748b] uppercase tracking-widest leading-none">Pendaftaran</p>
+                    <p class="text-xs font-bold text-[#0f1e3d] mt-1">Status Pendaftaran {{ ucfirst($role) }}</p>
+                </div>
             </div>
-            <button class="h-11 px-6 rounded-xl bg-[#0f1e3d] text-xs font-bold text-white hover:bg-[#1a2d52] transition">
-                Cari Data
-            </button>
-        </form>
+
+            <form action="{{ route('admin.users.toggle-registration', $role) }}" method="POST" x-data x-ref="toggleForm">
+                @csrf
+                <label class="relative inline-flex items-center cursor-pointer">
+                    @php
+                        $isEnabled = $role === 'siswa' ? ($school->registration_enabled_students ?? false) : ($school->registration_enabled_teachers ?? false);
+                    @endphp
+                    <input type="checkbox" name="enabled" value="1" {{ $isEnabled ? 'checked' : '' }} class="sr-only peer" @change="$refs.toggleForm.submit()">
+                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2c68f5]"></div>
+                </label>
+            </form>
+        </div>
     </div>
 
     {{-- Feedback Alert --}}
