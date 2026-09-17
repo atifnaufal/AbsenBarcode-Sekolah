@@ -15,7 +15,7 @@
     </div>
 
     {{-- Title Header --}}
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 animate-[fadeIn_.6s_ease]">
         <div>
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-[0.15em] mb-3 border border-emerald-100/50">
                 <i class="ti ti-history text-xs"></i>
@@ -36,8 +36,26 @@
         </div>
     </div>
 
+    {{-- Admin Pro-Tip for Audit --}}
+    <div class="mb-8 bg-blue-600 rounded-[32px] p-7 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden group animate-[slideIn_.5s_ease-out]">
+        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:rotate-12 transition-transform duration-700"><i class="ti ti-report-analytics text-9xl"></i></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center gap-8">
+            <div class="h-16 w-16 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center text-4xl shadow-inner">
+                <i class="ti ti-shield-search"></i>
+            </div>
+            <div class="flex-1">
+                <h4 class="text-lg font-black uppercase tracking-wider mb-1">Mekanisme Audit Presensi</h4>
+                <p class="text-xs font-medium text-blue-50 leading-relaxed max-w-3xl">
+                    Sistem secara otomatis mendeteksi siswa yang belum melakukan pemindaian sebagai <b>TIDAK HADIR</b>.
+                    Gunakan tombol <b>"+ Catat Izin"</b> untuk mengubah status mereka secara manual (Izin/Sakit).
+                    Status ini akan otomatis terintegrasi ke dalam rekapitulasi bulanan dan dokumen ekspor.
+                </p>
+            </div>
+        </div>
+    </div>
+
     {{-- Stats Grid --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 animate-[fadeIn_.8s_ease]">
         <div class="bg-white rounded-[32px] p-6 border border-school-line shadow-sm relative overflow-hidden group">
             <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="ti ti-users text-8xl text-blue-600"></i></div>
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Target</p>

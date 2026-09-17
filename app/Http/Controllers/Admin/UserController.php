@@ -46,7 +46,17 @@ class UserController extends Controller
     public function create(string $role){ return view('admin.users.form', ['role'=>$role,'user'=>new User(['role'=>UserRole::from($role)])]); }
     public function store(Request $request, string $role){
         $enum = UserRole::from($role);
-        $data = $request->validate(['name'=>'required|string|max:100','email'=>'required|email|unique:users,email','identifier'=>'required|string|max:30|unique:users,identifier','class_name'=>'required|string|max:50','password'=>'required|min:6']);
+        $data = $request->validate([
+            'name'=>'required|string|max:100',
+            'email'=>'required|email|unique:users,email',
+            'identifier'=>'required|string|max:30|unique:users,identifier',
+            'class_name'=>'required|string|max:50',
+            'password'=>'required|min:6'
+        ], [
+            'email.unique' => 'Alamat email ini sudah terdaftar di sistem.',
+            'identifier.unique' => 'NISN/NIP ini sudah terdaftar di sistem.',
+            'class_name.required' => 'Kolom Kelas/Jabatan wajib diisi untuk pengelompokan data.'
+        ]);
 
         $className = $data['class_name'];
         if ($role === 'guru' && !str_starts_with(strtolower($className), 'wali')) {
@@ -56,11 +66,21 @@ class UserController extends Controller
         $data['class_name'] = $className;
         $data['role']=$enum->value; $data['active']=true;
         User::create($data);
-        return redirect()->route('admin.users.index',$role)->with('ok','Data berhasil ditambah');
+        return redirect()->route('admin.users.index',$role)->with('ok','Anggota ' . $role . ' baru berhasil ditambahkan ke database.');
     }
     public function edit(string $role, User $user){ return view('admin.users.form', compact('role','user')); }
     public function update(Request $request, string $role, User $user){
-        $data=$request->validate(['name'=>'required|string|max:100','email'=>['required','email',Rule::unique('users')->ignore($user->id)],'identifier'=>['required','string','max:30',Rule::unique('users')->ignore($user->id)],'class_name'=>'required|string|max:50','password'=>'nullable|min:6','active'=>'boolean']);
+        $data=$request->validate([
+            'name'=>'required|string|max:100',
+            'email'=>['required','email',Rule::unique('users')->ignore($user->id)],
+            'identifier'=>['required','string','max:30',Rule::unique('users')->ignore($user->id)],
+            'class_name'=>'required|string|max:50',
+            'password'=>'nullable|min:6',
+            'active'=>'boolean'
+        ], [
+            'email.unique' => 'Email tersebut sudah digunakan oleh pengguna lain.',
+            'identifier.unique' => 'NISN/NIP tersebut sudah digunakan oleh anggota lain.'
+        ]);
 
         $className = $data['class_name'];
         if ($role === 'guru' && !str_starts_with(strtolower($className), 'wali')) {
@@ -69,9 +89,11 @@ class UserController extends Controller
         $data['class_name'] = $className;
 
         if(empty($data['password'])) unset($data['password']);
+        else $data['password'] = \Hash::make($data['password']);
+
         $data['active']=$request->boolean('active');
         $user->update($data);
-        return redirect()->route('admin.users.index',$role)->with('ok','Data diperbarui');
+        return redirect()->route('admin.users.index',$role)->with('ok','Data ' . $user->name . ' telah berhasil diperbarui.');
     }
     public function destroy(string $role, User $user){ $user->delete(); return back()->with('ok','Data dihapus'); }
 }

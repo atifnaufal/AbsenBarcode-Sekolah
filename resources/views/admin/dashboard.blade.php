@@ -4,7 +4,7 @@
     <div class="mx-auto max-w-[1440px] px-2 sm:px-4 lg:px-6">
 
         {{-- Elite 3D Glassmorphic Header --}}
-        <div class="mb-8 rounded-3xl bg-gradient-to-r from-[#0f1e3d] via-[#1a3a7a] to-[#2c68f5] p-6 lg:p-8 text-white shadow-[0_20px_40px_rgba(15,30,61,0.25),inset_0_1px_1px_rgba(255,255,255,0.2)] relative overflow-hidden group">
+        <div class="mb-8 rounded-3xl bg-gradient-to-r from-[#0f1e3d] via-[#1a3a7a] to-[#2c68f5] p-6 lg:p-8 text-white shadow-[0_20px_40px_rgba(15,30,61,0.25),inset_0_1px_1px_rgba(255,255,255,0.2)] relative overflow-hidden group animate-[fadeIn_.6s_ease]">
             <div class="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl group-hover:scale-110 transition duration-700"></div>
             <div class="absolute -left-12 -bottom-12 h-48 w-48 rounded-full bg-[#623ed8]/20 blur-2xl"></div>
 
@@ -15,7 +15,7 @@
                         Pusat Kendali Utama ·
                     </div>
                     <h1 class="font-display text-3xl font-black tracking-tight text-white sm:text-4xl">Dashboard Ringkasan Admin</h1>
-                    <p class="mt-2 text-sm text-white/80">Selamat datang kembali, <span class="font-bold text-[#ffd500]">{{ $activeUser->name }}</span>. Mengelola aktivitas kehadiran SMK Bina Utama Kendal.</p>
+                    <p class="mt-2 text-sm text-white/80">Selamat datang kembali, <span class="font-bold text-[#ffd500]">{{ $activeUser->name }}</span>. Mengelola aktivitas kehadiran {{ $school->name }}.</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3">
@@ -30,6 +30,24 @@
                         <i class="ti ti-device-tv-old text-lg"></i>
                         Buka Layar Utama Monitor
                     </a>
+                </div>
+            </div>
+        </div>
+
+        {{-- Admin Workflow Briefing --}}
+        <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6 animate-[slideIn_.5s_ease-out]">
+            <div class="bg-blue-600 rounded-[32px] p-6 text-white shadow-xl shadow-blue-500/20 flex gap-5 items-center group">
+                <div class="h-12 w-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl flex-shrink-0 group-hover:rotate-12 transition-transform"><i class="ti ti-scan"></i></div>
+                <div>
+                    <h4 class="text-xs font-black uppercase tracking-widest mb-1">Mulai Absensi</h4>
+                    <p class="text-[10px] font-medium text-blue-50 leading-relaxed">Aktifkan <b>Layar Monitor</b> agar siswa dapat memindai QR Code sesuai jadwal yang ditentukan.</p>
+                </div>
+            </div>
+            <div class="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-500/20 flex gap-5 items-center group">
+                <div class="h-12 w-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl flex-shrink-0 group-hover:rotate-12 transition-transform"><i class="ti ti-report-analytics"></i></div>
+                <div>
+                    <h4 class="text-xs font-black uppercase tracking-widest mb-1">Audit & Rekap</h4>
+                    <p class="text-[10px] font-medium text-indigo-50 leading-relaxed">Cek menu <b>Laporan</b> secara berkala untuk memvalidasi siswa yang izin atau tidak hadir hari ini.</p>
                 </div>
             </div>
         </div>

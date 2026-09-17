@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="max-w-[720px] mx-auto py-12 px-4">
-    <div class="mb-10 text-center">
+    <div class="mb-10 text-center animate-[fadeIn_.6s_ease]">
         <div class="inline-flex h-16 w-16 rounded-3xl bg-blue-50 text-[#2c68f5] items-center justify-center text-3xl shadow-inner mb-4">
             <i class="ti {{ $user->exists ? 'ti-user-edit' : 'ti-user-plus' }}"></i>
         </div>
@@ -9,7 +9,19 @@
         <p class="text-sm text-[#64748b] mt-2 font-medium">Lengkapi formulir di bawah untuk memproses data ke database sistem.</p>
     </div>
 
-    <div class="bg-white rounded-[40px] border border-school-line shadow-2xl shadow-slate-200/50 p-8 sm:p-12 relative overflow-hidden group">
+    {{-- Admin Pro-Tip --}}
+    <div class="mb-8 bg-amber-50 border border-amber-100 rounded-3xl p-5 flex items-start gap-4 animate-[slideIn_.5s_ease-out]">
+        <div class="h-10 w-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0"><i class="ti ti-alert-triangle text-xl"></i></div>
+        <div>
+            <p class="text-[10px] font-black text-amber-700 uppercase tracking-widest mb-1">Peringatan Input Data</p>
+            <p class="text-xs text-amber-800/80 font-medium leading-relaxed">
+                Pastikan <b>{{ $role === 'siswa' ? 'NISN' : 'NIP' }}</b> unik dan tidak duplikat. Sistem akan menolak jika email atau identitas sudah terdaftar.
+                @if($role === 'guru') Nama kelas akan otomatis diawali kata <b>'Wali Kelas'</b> jika belum ada. @endif
+            </p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[40px] border border-school-line shadow-2xl shadow-slate-200/50 p-8 sm:p-12 relative overflow-hidden group animate-[fadeIn_.8s_ease]">
         <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-700">
             <i class="ti ti-shield-check text-9xl"></i>
         </div>

@@ -2,23 +2,45 @@
 @section('content')
 <div class="max-w-[1280px] mx-auto px-2 sm:px-4">
 
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10 animate-[fadeIn_.6s_ease]">
         <div>
-            <div class="text-[10px] font-black uppercase tracking-[0.2em] text-[#623ed8] mb-1">Manajemen Waktu</div>
-            <h1 class="text-2xl font-black text-[#0f1e3d] font-display">Agenda & Notifikasi Jam</h1>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-[0.15em] mb-3 border border-indigo-100/50">
+                <i class="ti ti-calendar-time text-xs"></i>
+                Timeline Management
+            </div>
+            <h1 class="text-3xl font-black text-[#0f1e3d] font-display tracking-tight">Agenda & Jadwal Notifikasi</h1>
+            <p class="text-sm text-[#64748b] mt-2 font-medium">Atur urutan agenda sekolah untuk dimunculkan pada banner dashboard siswa/guru.</p>
         </div>
-        <button onclick="document.getElementById('addScheduleModal').showModal()" class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#2c68f5] to-[#623ed8] px-5 text-xs font-bold text-white shadow-lg shadow-[#2c68f5]/20 hover:opacity-95 transition">
-            <i class="ti ti-plus text-base"></i> Tambah Agenda Baru
+        <button onclick="document.getElementById('addScheduleModal').showModal()" class="h-12 inline-flex items-center gap-2 rounded-2xl bg-[#0f1e3d] px-6 text-xs font-black text-white shadow-xl shadow-[#0f1e3d]/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 uppercase tracking-widest">
+            <i class="ti ti-plus text-base"></i>
+            <span>Tambah Agenda</span>
         </button>
     </div>
 
+    {{-- Admin Guidance for Schedules --}}
+    <div class="mb-10 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[32px] p-8 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group animate-[slideIn_.5s_ease-out]">
+        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:rotate-12 transition-transform duration-700"><i class="ti ti-bell-ringing text-9xl"></i></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center gap-8">
+            <div class="h-16 w-16 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center text-4xl shadow-inner">
+                <i class="ti ti-bulb"></i>
+            </div>
+            <div>
+                <h4 class="text-lg font-black uppercase tracking-wider mb-1">Mekanisme Notifikasi Otomatis</h4>
+                <p class="text-xs font-medium text-indigo-50 leading-relaxed max-w-4xl">
+                    Agenda yang Anda buat di sini akan otomatis muncul sebagai <b>Banner Notifikasi Live</b> di dashboard HP siswa/guru tepat pada jam yang ditentukan.
+                    Sistem akan memvalidasi waktu server dan mengganti banner secara real-time saat satu agenda berakhir dan agenda lain dimulai.
+                </p>
+            </div>
+        </div>
+    </div>
+
     @if(session('ok'))
-    <div class="mb-6 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-sm text-emerald-800 font-medium flex items-center gap-2">
-        <i class="ti ti-circle-check text-lg text-emerald-600"></i> {{ session('ok') }}
+    <div class="mb-8 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 px-5 py-3 text-sm text-emerald-800 font-medium flex items-center gap-3 animate-[slideIn_.3s_ease-out]">
+        <i class="ti ti-circle-check text-emerald-600 text-lg"></i> {{ session('ok') }}
     </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-[fadeIn_.8s_ease]">
         @forelse($schedules as $s)
         <div class="bg-white rounded-[32px] p-6 shadow-sm border border-school-line hover:shadow-md transition group">
             <div class="flex items-start justify-between mb-4">

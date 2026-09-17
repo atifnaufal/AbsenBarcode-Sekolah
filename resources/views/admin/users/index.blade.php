@@ -25,7 +25,24 @@
     </div>
 
     {{-- Controls Suite --}}
-    <div class="grid grid-cols-1 xl:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 xl:grid-cols-4 gap-6 mb-8 animate-[slideIn_.5s_ease-out]">
+        {{-- Admin Guide Note --}}
+        <div class="xl:col-span-4 bg-gradient-to-r from-blue-600 to-[#2c68f5] rounded-[32px] p-6 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden">
+            <div class="absolute right-0 top-0 p-4 opacity-10 rotate-12"><i class="ti ti-info-circle text-9xl"></i></div>
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center gap-6">
+                <div class="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl">
+                    <i class="ti ti-bulb"></i>
+                </div>
+                <div>
+                    <h4 class="text-lg font-black uppercase tracking-wider">Panduan Manajemen {{ ucfirst($role) }}</h4>
+                    <p class="text-xs font-medium text-blue-50 mt-1 leading-relaxed">
+                        Gunakan kolom pencarian untuk menemukan data spesifik. Anda dapat memfilter berdasarkan <b>Kelas/Grup</b> untuk pengelompokan yang lebih rapi.
+                        Klik ikon <b>Edit</b> untuk memperbarui data atau <b>Hapus</b> untuk membersihkan database. Pastikan <b>Status Aktif</b> menyala agar user bisa login.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         {{-- Search & Filter Bar --}}
         <div class="xl:col-span-3 bg-white rounded-[32px] border border-school-line p-5 shadow-sm">
             <form class="flex flex-col lg:flex-row gap-4">
