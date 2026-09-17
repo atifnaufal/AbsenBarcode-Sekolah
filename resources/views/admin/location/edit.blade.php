@@ -8,12 +8,41 @@
 <div class="max-w-[1280px] mx-auto px-4 py-8">
     <div class="mb-10 animate-[fadeIn_.6s_ease]">
         <div class="flex items-center gap-4">
-            <div class="h-14 w-14 rounded-2xl bg-gradient-to-tr from-[#0f1e3d] to-[#2c68f5] flex items-center justify-center text-white text-3xl shadow-xl shadow-blue-500/20">
-                <i class="ti ti-map-2"></i>
+            <div class="h-14 w-14 rounded-2xl bg-[#0f1e3d] text-white flex items-center justify-center text-3xl shadow-xl shadow-[#0f1e3d]/20 border border-white/10">
+                <i class="ti ti-settings-automation"></i>
             </div>
             <div>
-                <h1 class="font-display text-3xl font-black text-[#0f1e3d] tracking-tight">Geofencing & Koordinat</h1>
-                <p class="text-sm text-[#68748b] font-medium">Konfigurasi pusat lokasi instansi dan batasan radius pemindaian.</p>
+                <h1 class="font-display text-3xl font-black text-[#0f1e3d] tracking-tight">Aktivasi Pengaturan</h1>
+                <p class="text-sm text-[#68748b] font-medium uppercase tracking-widest">Sistem Konfigurasi Lokasi & Sesi</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Smart Search Console --}}
+    <div class="mb-10 bg-white rounded-[40px] border border-school-line p-8 shadow-sm animate-[slideIn_.4s_ease-out] relative overflow-hidden group">
+        <div class="absolute -right-24 -top-24 h-64 w-64 bg-blue-50 rounded-full blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-700"></div>
+        <div class="relative z-10">
+            <div class="flex flex-col md:flex-row md:items-end gap-6">
+                <div class="flex-1 space-y-2">
+                    <div class="flex items-center gap-2 mb-1.5 pl-1">
+                        <div class="h-5 w-5 rounded-lg bg-blue-100 text-[#2c68f5] flex items-center justify-center text-xs"><i class="ti ti-brand-google-maps"></i></div>
+                        <label class="text-[10px] font-black uppercase tracking-widest text-[#2c68f5]">Cari Lokasi / Salin Link Google Maps</label>
+                    </div>
+                    <div class="relative group/search">
+                        <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/search:text-[#2c68f5] transition-colors"></i>
+                        <input type="text" id="smartSearch" class="w-full h-14 bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 text-sm font-bold text-[#0f1e3d] focus:border-[#2c68f5] focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all placeholder:text-slate-400" placeholder="Paste link maps (ex: https://maps.app.goo.gl/...) atau ketik alamat lengkap">
+                    </div>
+                </div>
+                <button type="button" id="btnSmartSearch" class="h-14 px-8 rounded-2xl bg-[#0f1e3d] text-white text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg shadow-slate-900/20 active:scale-95 flex items-center justify-center gap-3">
+                    <i class="ti ti-wand text-lg text-[#ffd500]"></i>
+                    <span>Analisis & Generate</span>
+                </button>
+            </div>
+            <div id="searchFeedback" class="mt-4 hidden animate-[fadeIn_.3s_ease]">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-600 text-[10px] font-bold border border-emerald-100">
+                    <i class="ti ti-circle-check"></i>
+                    <span id="feedbackText">Koordinat ditemukan & diperbarui secara otomatis.</span>
+                </div>
             </div>
         </div>
     </div>
@@ -206,6 +235,70 @@
 
         ['inputLat', 'inputLng', 'inputRadius'].forEach(id => {
             document.getElementById(id).addEventListener('input', syncMapFromInputs);
+        });
+
+        // 🧠 SMART SEARCH & GENERATE LOGIC
+        const btnSearch = document.getElementById('btnSmartSearch');
+        const inputSearch = document.getElementById('smartSearch');
+        const feedback = document.getElementById('searchFeedback');
+        const feedbackText = document.getElementById('feedbackText');
+
+        btnSearch.addEventListener('click', async () => {
+            const query = inputSearch.value.trim();
+            if (!query) return;
+
+            btnSearch.disabled = true;
+            btnSearch.innerHTML = '<i class="ti ti-loader-2 animate-spin"></i> Analyzing...';
+
+            try {
+                let nLat, nLng;
+
+                // 1. Check for Google Maps URL pattern (@lat,lng)
+                const urlCoordsMatch = query.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+                const qCoordsMatch = query.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+
+                if (urlCoordsMatch) {
+                    nLat = parseFloat(urlCoordsMatch[1]);
+                    nLng = parseFloat(urlCoordsMatch[2]);
+                } else if (qCoordsMatch) {
+                    nLat = parseFloat(qCoordsMatch[1]);
+                    nLng = parseFloat(qCoordsMatch[2]);
+                } else {
+                    // 2. Geocoding using Nominatim (OpenStreetMap)
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+                    const data = await response.json();
+
+                    if (data && data.length > 0) {
+                        nLat = parseFloat(data[0].lat);
+                        nLng = parseFloat(data[0].lon);
+                    }
+                }
+
+                if (nLat && nLng) {
+                    document.getElementById('inputLat').value = nLat.toFixed(7);
+                    document.getElementById('inputLng').value = nLng.toFixed(7);
+
+                    const newPos = [nLat, nLng];
+                    schoolMarker.setLatLng(newPos);
+                    geofenceCircle.setLatLng(newPos);
+                    map.setView(newPos, 17);
+
+                    feedback.classList.remove('hidden');
+                    feedback.querySelector('div').className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-600 text-[10px] font-bold border border-emerald-100";
+                    feedbackText.innerText = "Lokasi ditemukan & koordinat berhasil sinkron!";
+                } else {
+                    throw new Error("Lokasi tidak dikenali.");
+                }
+
+            } catch (error) {
+                feedback.classList.remove('hidden');
+                feedback.querySelector('div').className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-red-50 text-red-600 text-[10px] font-bold border border-red-100";
+                feedbackText.innerText = "Gagal mendeteksi lokasi. Pastikan link/alamat benar.";
+            } finally {
+                btnSearch.disabled = false;
+                btnSearch.innerHTML = '<i class="ti ti-wand text-lg text-[#ffd500]"></i> <span>Analisis & Generate</span>';
+                setTimeout(() => feedback.classList.add('hidden'), 5000);
+            }
         });
     });
 </script>

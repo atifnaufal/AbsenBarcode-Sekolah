@@ -39,7 +39,7 @@
             ['route'=>'admin.users.index','param'=>['role'=>'siswa'],'label'=>'Data siswa','icon'=>'ti-school'],
             ['route'=>'admin.schedules.index','param'=>[],'label'=>'Agenda Jadwal','icon'=>'ti-calendar-time'],
             ['route'=>'admin.reports.index','param'=>[],'label'=>'Laporan','icon'=>'ti-file-spreadsheet'],
-            ['route'=>'admin.location.edit','param'=>[],'label'=>'Lokasi sekolah','icon'=>'ti-map-pin']
+            ['route'=>'admin.location.edit','param'=>[],'label'=>'Aktivasi Pengaturan','icon'=>'ti-settings-automation']
         ]; @endphp
         @foreach ($crudNav as $item)
             <a href="{{ route($item['route'],$item['param']) }}" class="flex h-[42px] w-full items-center gap-3 rounded-school-control px-3 text-left text-[13px] font-semibold {{ request()->routeIs($item['route'].'*') ? 'text-white bg-white/10' : 'text-white/65 hover:bg-white/10 hover:text-white' }}">
