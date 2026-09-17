@@ -55,7 +55,7 @@ class ReportController extends Controller{
             ->orderBy('name')
             ->paginate(30)->withQueryString();
 
-        $classes = User::where('role', UserRole::SISWA)->whereNotNull('class_name')->distinct()->pluck('class_name');
+        $classes = User::where('role', UserRole::SISWA->value)->whereNotNull('class_name')->distinct()->pluck('class_name');
         $reportTitle = $this->getReportTitle($date, $filterType);
 
         return view('admin.reports.index', compact('users', 'date', 'filterType', 'reportTitle', 'role', 'className', 'classes', 'usersCount', 'presentCount'));
@@ -77,7 +77,7 @@ class ReportController extends Controller{
 
         $rows = User::query()
             ->where('active', true)
-            ->where('role', $role === 'guru' ? UserRole::GURU : UserRole::SISWA)
+            ->where('role', $role === 'guru' ? UserRole::GURU->value : UserRole::SISWA->value)
             ->when($role === 'siswa' && $className, fn($q) => $q->where('class_name', $className))
             ->with(['attendances' => function($q) use ($date, $filterType) {
                 if ($filterType === 'month') {

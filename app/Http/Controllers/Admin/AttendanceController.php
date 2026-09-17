@@ -18,12 +18,25 @@ class AttendanceController extends Controller
             'session_label' => 'nullable|string|max:100',
         ]);
 
+        // Prevent duplicate attendance for same user on same day
+        $exists = Attendance::where('user_id', $data['user_id'])
+            ->whereDate('attendance_date', $data['attendance_date'])
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'Anggota sudah memiliki rekaman kehadiran pada tanggal tersebut.');
+        }
+
         Attendance::create([
             'user_id' => $data['user_id'],
             'attendance_date' => $data['attendance_date'],
             'result' => $data['result'],
             'session_label' => $data['session_label'],
             'scanned_at' => $data['attendance_date'] === now()->toDateString() ? now() : \Carbon\Carbon::parse($data['attendance_date'])->startOfDay(),
+            'attendance_token_id' => null, // Allowed by new migration
+            'latitude' => null,
+            'longitude' => null,
+            'distance_meters' => null,
         ]);
 
         return back()->with('ok', 'Status kehadiran berhasil dicatat secara manual.');
