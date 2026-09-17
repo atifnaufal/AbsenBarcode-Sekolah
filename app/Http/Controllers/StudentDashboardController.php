@@ -16,13 +16,34 @@ class StudentDashboardController extends Controller
     {
         $user = auth()->user();
         $school = SchoolSetting::firstOrFail();
-        $today = now($school->timezone)->toDateString();
-        $monthStart = now($school->timezone)->startOfMonth()->toDateString();
-        $monthEnd = now($school->timezone)->endOfMonth()->toDateString();
+        $today = now($school->timezone);
+        $monthStart = $today->copy()->startOfMonth()->toDateString();
+        $monthEnd = $today->copy()->endOfMonth()->toDateString();
 
         $todayAttendance = Attendance::where('user_id', $user->id)
-            ->whereDate('attendance_date', $today)
+            ->whereDate('attendance_date', $today->toDateString())
             ->first();
+
+        // 🟢 TODAY STATUS LOGIC
+        $currentTime = $today->format('H:i:s');
+        $activeAgenda = \App\Models\SchoolSchedule::where('active', true)
+            ->where('start_time', '<=', $currentTime)
+            ->where('end_time', '>=', $currentTime)
+            ->first();
+
+        $anySessionToday = \App\Models\SchoolSchedule::where('active', true)->exists();
+        $latestSessionToday = \App\Models\SchoolSchedule::where('active', true)->orderBy('end_time', 'desc')->first();
+
+        $todayStatus = 'diluar_agenda';
+        if ($todayAttendance) {
+            $todayStatus = $todayAttendance->result->value;
+        } elseif ($anySessionToday) {
+            if ($activeAgenda) {
+                $todayStatus = 'belum_absen';
+            } elseif ($latestSessionToday && $currentTime > $latestSessionToday->end_time) {
+                $todayStatus = 'tidak_hadir';
+            }
+        }
 
         $monthAttendances = Attendance::where('user_id', $user->id)
             ->whereBetween('attendance_date', [$monthStart, $monthEnd])
@@ -31,13 +52,13 @@ class StudentDashboardController extends Controller
 
         $stats = [
             'today' => [
-                'status' => $todayAttendance?->result->value ?? 'belum_absen',
+                'status' => $todayStatus,
                 'time' => $todayAttendance?->scanned_at?->format('H:i') ?? '-',
                 'distance' => $todayAttendance?->distance_meters ? round($todayAttendance->distance_meters) . 'm' : '-',
             ],
             'month' => [
                 'total' => $monthAttendances->count(),
-                'hadir' => $monthAttendances->where('result', AttendanceResult::SUCCESS)->count(),
+                'hadir' => $monthAttendances->whereIn('result', [AttendanceResult::SUCCESS, AttendanceResult::PERMISSION, AttendanceResult::SICK])->count(),
                 'terlambat' => $monthAttendances->whereIn('result', [AttendanceResult::EXPIRED, AttendanceResult::DUPLICATE])->count(),
                 'di_luar' => $monthAttendances->where('result', AttendanceResult::OUTSIDE_AREA)->count(),
                 'tidak_hadir' => $this->calculateAbsence($user, $school),
@@ -49,13 +70,6 @@ class StudentDashboardController extends Controller
             ->latest('scanned_at')
             ->limit(5)
             ->get();
-
-        // NEW: Fetch Current Active Schedule/Agenda
-        $currentTime = now($school->timezone)->format('H:i:s');
-        $activeAgenda = \App\Models\SchoolSchedule::where('active', true)
-            ->where('start_time', '<=', $currentTime)
-            ->where('end_time', '>=', $currentTime)
-            ->first();
 
         $teacherRankings = collect();
         if ($user->role === UserRole::GURU) {
@@ -158,17 +172,18 @@ class StudentDashboardController extends Controller
         $start = now($school->timezone)->startOfMonth();
         $today = now($school->timezone);
 
-        // ✅ NEW LOGIC: Only count days where at least one person scanned in the system
-        // This prevents counting holidays or days before the app was launched as "Alfa"
+        // ✅ LOGIC: Only count days where at least one person scanned in the system
+        // This signifies a "Valid School Session Day"
         $systemActiveDays = Attendance::query()
             ->whereBetween('attendance_date', [$start->toDateString(), $today->toDateString()])
             ->distinct()
             ->pluck('attendance_date')
             ->count();
 
+        // Count user successful or justified absences (Permission/Sick)
         $userAttendancesCount = Attendance::where('user_id', $user->id)
             ->whereBetween('attendance_date', [$start->toDateString(), $today->toDateString()])
-            ->where('result', AttendanceResult::SUCCESS)
+            ->whereIn('result', [AttendanceResult::SUCCESS, AttendanceResult::PERMISSION, AttendanceResult::SICK])
             ->count();
 
         return max(0, $systemActiveDays - $userAttendancesCount);

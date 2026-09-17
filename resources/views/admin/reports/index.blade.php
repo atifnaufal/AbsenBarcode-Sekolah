@@ -109,8 +109,8 @@
         </div>
     </div>
 
-    {{-- Main Table Panel --}}
-    <div class="bg-white rounded-[40px] border border-school-line shadow-sm overflow-hidden mb-12">
+    {{-- Data Display Panel --}}
+    <div class="bg-white rounded-[40px] border border-school-line shadow-sm overflow-hidden mb-12" x-data="{ manualId: null, manualName: '' }">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-[#f8f9fc] text-[10px] font-black uppercase tracking-[0.15em] text-[#68748b] border-b border-school-line">
@@ -160,7 +160,7 @@
                                     </form>
                                 </div>
                             @else
-                                <span class="text-[10px] text-slate-300 font-bold uppercase tracking-widest italic">Tanpa Rekaman</span>
+                                <button @click="manualId = {{ $u->id }}; manualName = '{{ $u->name }}'; $nextTick(() => $refs.manualDialog.showModal())" class="text-[10px] text-[#2c68f5] font-black uppercase tracking-widest hover:underline">+ Beri Keterangan</button>
                             @endif
                         </td>
                         <td class="px-8 py-5 text-center">
@@ -168,8 +168,16 @@
                         </td>
                         <td class="px-8 py-5 text-right">
                             @if($a)
-                                <span class="inline-flex px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest {{ $a->result->value === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-orange-50 text-orange-600 border border-orange-100' }}">
-                                    {{ $a->result->value }}
+                                @php
+                                    $color = match($a->result->value) {
+                                        'success' => 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                                        'permission' => 'bg-blue-50 text-blue-600 border-blue-100',
+                                        'sick' => 'bg-amber-50 text-amber-600 border-amber-100',
+                                        default => 'bg-orange-50 text-orange-600 border-orange-100',
+                                    };
+                                @endphp
+                                <span class="inline-flex px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest border {{ $color }}">
+                                    {{ $a->result->label() }}
                                 </span>
                             @else
                                 <span class="inline-flex px-3 py-1 rounded-xl bg-red-50 text-red-600 border border-red-100 text-[9px] font-black uppercase tracking-widest shadow-sm">
@@ -194,6 +202,40 @@
                 </tbody>
             </table>
         </div>
+
+        {{-- Manual Entry Dialog --}}
+        <dialog x-ref="manualDialog" class="modal rounded-[32px] p-0 shadow-2xl border-none overflow-hidden max-w-sm w-full backdrop:bg-black/60 backdrop:backdrop-blur-sm">
+            <div class="bg-[#0f1e3d] p-6 text-white">
+                <h3 class="font-black font-display uppercase tracking-widest">Catat Kehadiran Manual</h3>
+                <p class="text-[10px] font-bold text-slate-400 mt-1" x-text="manualName"></p>
+            </div>
+            <form method="POST" action="{{ route('attendances.store-manual') }}" class="p-6 space-y-4 bg-white">
+                @csrf
+                <input type="hidden" name="user_id" :value="manualId">
+                <input type="hidden" name="attendance_date" value="{{ $date }}">
+
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">Status Kehadiran</label>
+                    <select name="result" required class="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-4 text-xs font-bold outline-none">
+                        <option value="success">Hadir (Manual)</option>
+                        <option value="permission">Izin</option>
+                        <option value="sick">Sakit</option>
+                        <option value="absent">Tidak Hadir (Alfa)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">Keterangan / Agenda</label>
+                    <input type="text" name="session_label" class="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-4 text-xs font-bold outline-none" placeholder="Misal: Izin Lomba Luar Kota">
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button type="submit" class="flex-1 h-11 bg-[#0f1e3d] text-white font-black text-[10px] uppercase tracking-widest rounded-xl">Simpan Data</button>
+                    <button type="button" @click="$refs.manualDialog.close()" class="flex-1 h-11 bg-slate-100 text-slate-500 font-black text-[10px] uppercase tracking-widest rounded-xl">Batal</button>
+                </div>
+            </form>
+        </dialog>
+
         <div class="p-6 border-t border-school-line bg-[#f8f9fc]">
             {{ $users->links() }}
         </div>

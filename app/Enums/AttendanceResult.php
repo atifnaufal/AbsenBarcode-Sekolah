@@ -9,15 +9,21 @@ enum AttendanceResult: string
     case OUTSIDE_AREA = 'outside_area';
     case DUPLICATE = 'duplicate';
     case UNAVAILABLE = 'unavailable';
+    case PERMISSION = 'permission';
+    case SICK = 'sick';
+    case ABSENT = 'absent';
 
     public function label(): string
     {
         return match ($this) {
-            self::SUCCESS => 'Tercatat',
-            self::EXPIRED => 'QR kedaluwarsa',
-            self::OUTSIDE_AREA => 'Di luar area',
-            self::DUPLICATE => 'Sudah tercatat',
-            self::UNAVAILABLE => 'Belum tersedia',
+            self::SUCCESS => 'Tercatat (Hadir)',
+            self::EXPIRED => 'QR Kedaluwarsa',
+            self::OUTSIDE_AREA => 'Di Luar Area',
+            self::DUPLICATE => 'Sudah Tercatat',
+            self::UNAVAILABLE => 'Belum Tersedia',
+            self::PERMISSION => 'Izin',
+            self::SICK => 'Sakit',
+            self::ABSENT => 'Tidak Hadir (Alfa)',
         };
     }
 }
