@@ -117,8 +117,6 @@
                 </div>
             </form>
         </div>
-            </form>
-        </div>
 
         {{-- Live Render Maps Panel --}}
         <div class="rounded-3xl border border-school-line bg-white shadow-sm overflow-hidden flex flex-col justify-between">

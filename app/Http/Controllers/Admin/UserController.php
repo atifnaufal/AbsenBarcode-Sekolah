@@ -46,14 +46,28 @@ class UserController extends Controller
     public function create(string $role){ return view('admin.users.form', ['role'=>$role,'user'=>new User(['role'=>UserRole::from($role)])]); }
     public function store(Request $request, string $role){
         $enum = UserRole::from($role);
-        $data = $request->validate(['name'=>'required|string|max:100','email'=>'required|email|unique:users,email','identifier'=>'required|string|max:30|unique:users,identifier','class_name'=>'nullable|string|max:50','password'=>'required|min:6']);
+        $data = $request->validate(['name'=>'required|string|max:100','email'=>'required|email|unique:users,email','identifier'=>'required|string|max:30|unique:users,identifier','class_name'=>'required|string|max:50','password'=>'required|min:6']);
+
+        $className = $data['class_name'];
+        if ($role === 'guru' && !str_starts_with(strtolower($className), 'wali')) {
+            $className = 'Wali Kelas ' . $className;
+        }
+
+        $data['class_name'] = $className;
         $data['role']=$enum->value; $data['active']=true;
         User::create($data);
         return redirect()->route('admin.users.index',$role)->with('ok','Data berhasil ditambah');
     }
     public function edit(string $role, User $user){ return view('admin.users.form', compact('role','user')); }
     public function update(Request $request, string $role, User $user){
-        $data=$request->validate(['name'=>'required|string|max:100','email'=>['required','email',Rule::unique('users')->ignore($user->id)],'identifier'=>['required','string','max:30',Rule::unique('users')->ignore($user->id)],'class_name'=>'nullable|string|max:50','password'=>'nullable|min:6','active'=>'boolean']);
+        $data=$request->validate(['name'=>'required|string|max:100','email'=>['required','email',Rule::unique('users')->ignore($user->id)],'identifier'=>['required','string','max:30',Rule::unique('users')->ignore($user->id)],'class_name'=>'required|string|max:50','password'=>'nullable|min:6','active'=>'boolean']);
+
+        $className = $data['class_name'];
+        if ($role === 'guru' && !str_starts_with(strtolower($className), 'wali')) {
+            $className = 'Wali Kelas ' . $className;
+        }
+        $data['class_name'] = $className;
+
         if(empty($data['password'])) unset($data['password']);
         $data['active']=$request->boolean('active');
         $user->update($data);

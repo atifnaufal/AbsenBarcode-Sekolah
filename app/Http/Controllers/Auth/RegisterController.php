@@ -44,16 +44,22 @@ class RegisterController extends Controller
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'identifier' => 'required|string|max:30|unique:users,identifier',
-            'class_name' => $role === 'siswa' ? 'required|string|max:50' : 'nullable|string|max:50',
+            'class_name' => 'required|string|max:50',
             'password' => 'required|min:6|confirmed',
             'role' => 'required|in:siswa,guru',
         ]);
+
+        $className = $data['class_name'];
+        if ($role === 'guru') {
+            // For Guru: "Wali Kelas XI RPL"
+            $className = 'Wali Kelas ' . $className;
+        }
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'identifier' => $data['identifier'],
-            'class_name' => $data['class_name'] ?? ($role === 'guru' ? 'Staf Pengajar' : null),
+            'class_name' => $className,
             'password' => Hash::make($data['password']),
             'role' => $role === 'siswa' ? UserRole::SISWA : UserRole::GURU,
             'active' => true,

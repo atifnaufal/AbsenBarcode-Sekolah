@@ -50,8 +50,8 @@
                     @error('identifier')<p class="text-[10px] text-red-500 font-bold mt-1 pl-1">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1">{{ $role === 'siswa' ? 'Kelas' : 'Unit' }}</label>
-                    <input name="class_name" type="text" value="{{ old('class_name') }}" {{ $role === 'siswa' ? 'required' : '' }} class="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl px-4 mt-1.5 text-sm font-bold text-[#0f1e3d] focus:border-[#2c68f5] focus:bg-white outline-none transition shadow-inner" placeholder="X TKJ 1">
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1">{{ $role === 'siswa' ? 'Kelas' : 'Wali Kelas' }}</label>
+                    <input name="class_name" type="text" value="{{ old('class_name') }}" required class="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl px-4 mt-1.5 text-sm font-bold text-[#0f1e3d] focus:border-[#2c68f5] focus:bg-white outline-none transition shadow-inner" placeholder="{{ $role === 'siswa' ? 'X TKJ 1' : 'XI RPL (Tanpa kata Wali)' }}">
                     @error('class_name')<p class="text-[10px] text-red-500 font-bold mt-1 pl-1">{{ $message }}</p>@enderror
                 </div>
             </div>

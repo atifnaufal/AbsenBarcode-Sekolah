@@ -120,8 +120,8 @@
                             <td class="px-6 py-4 font-mono text-xs text-[#68748b]">{{ $u->identifier }}</td>
                             <td class="px-6 py-4 text-[#68748b]">{{ $u->email }}</td>
                             <td class="px-6 py-4">
-                                <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold bg-[#f2f5fa] text-[#623ed8]">
-                                    {{ $u->class_name ?? '-' }}
+                                <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold bg-[#f2f5fa] text-[#623ed8] border border-[#623ed8]/10 shadow-sm">
+                                    {{ $u->class_name ?: '-' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right">

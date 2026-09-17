@@ -10,13 +10,17 @@ class ReportController extends Controller{
     public function index(Request $r){
         $date = $r->input('date', now()->toDateString());
         $filterType = $r->input('filter_type', 'day');
-        $role = $r->input('role');
+        $role = $r->input('role', 'siswa'); // Default to siswa as requested
         $className = $r->input('class_name');
 
         $userQuery = User::query()
             ->where('active', true)
-            ->when($role, fn($q) => $q->where('role', $role))
-            ->when($className, fn($q) => $q->where('class_name', $className));
+            ->where('role', $role === 'guru' ? UserRole::GURU : UserRole::SISWA);
+
+        // If Siswa, allow filtering by class. If Guru, the user said "all user -> role guru"
+        if ($role === 'siswa' && $className) {
+            $userQuery->where('class_name', $className);
+        }
 
         $usersCount = (clone $userQuery)->count();
 
@@ -38,7 +42,7 @@ class ReportController extends Controller{
         $presentCount = 0;
         foreach($users as $u) { if($u->attendances->isNotEmpty()) $presentCount++; }
 
-        $classes = User::whereNotNull('class_name')->distinct()->pluck('class_name');
+        $classes = User::where('role', UserRole::SISWA)->whereNotNull('class_name')->distinct()->pluck('class_name');
         $reportTitle = $this->getReportTitle($date, $filterType);
 
         return view('admin.reports.index', compact('users', 'date', 'filterType', 'reportTitle', 'role', 'className', 'classes', 'usersCount', 'presentCount'));
@@ -55,13 +59,13 @@ class ReportController extends Controller{
         $date = $r->input('date', now()->toDateString());
         $filterType = $r->input('filter_type', 'day');
         $format = $r->input('format', 'csv');
-        $role = $r->input('role');
+        $role = $r->input('role', 'siswa');
         $className = $r->input('class_name');
 
         $rows = User::query()
             ->where('active', true)
-            ->when($role, fn($q) => $q->where('role', $role))
-            ->when($className, fn($q) => $q->where('class_name', $className))
+            ->where('role', $role === 'guru' ? UserRole::GURU : UserRole::SISWA)
+            ->when($role === 'siswa' && $className, fn($q) => $q->where('class_name', $className))
             ->with(['attendances' => function($q) use ($date, $filterType) {
                 if ($filterType === 'month') {
                     $q->whereMonth('attendance_date', date('m', strtotime($date)))->whereYear('attendance_date', date('Y', strtotime($date)));
@@ -86,7 +90,7 @@ class ReportController extends Controller{
             $output .= "<head><meta charset=\"utf-8\"></head><body>";
             $output .= "<h2>LAPORAN KEHADIRAN DIGITAL SMK BINA UTAMA KENDAL</h2>";
             $output .= "<h4>$reportTitle</h4>";
-            $output .= "<table border=\"1\"><tr style=\"background-color: #2c68f5; color: #ffffff;\"><th>Nama</th><th>ID</th><th>Kelas</th><th>Waktu</th><th>Status</th><th>Keterangan</th></tr>";
+            $output .= "<table border=\"1\"><tr style=\"background-color: #2c68f5; color: #ffffff;\"><th>Nama</th><th>ID</th><th>Kelas/Grup</th><th>Waktu</th><th>Status</th><th>Keterangan</th></tr>";
             foreach($rows as $u) {
                 $a = $u->attendances->first();
                 $time = $a ? ($a->scanned_at ? $a->scanned_at->format('H:i:s') : '--:--') : '-';
@@ -98,7 +102,7 @@ class ReportController extends Controller{
             return response($output, 200, ['Content-Type' => 'application/vnd.ms-excel', 'Content-Disposition' => "attachment; filename=laporan.xls"]);
         }
 
-        $csv="Nama,ID,Kelas,Waktu,Status,Keterangan\n";
+        $csv="Nama,ID,Kelas/Grup,Waktu,Status,Keterangan\n";
         foreach($rows as $u) {
             $a = $u->attendances->first();
             $time = $a ? ($a->scanned_at ? $a->scanned_at->format('H:i:s') : '') : '';
