@@ -30,8 +30,9 @@
                     </div>
                     <div class="relative group/search">
                         <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/search:text-[#2c68f5] transition-colors"></i>
-                        <input type="text" id="smartSearch" class="w-full h-14 bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 text-sm font-bold text-[#0f1e3d] focus:border-[#2c68f5] focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all placeholder:text-slate-400" placeholder="Paste link maps (ex: https://maps.app.goo.gl/...) atau ketik alamat lengkap">
+                        <input type="text" id="smartSearch" class="w-full h-14 bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 text-sm font-bold text-[#0f1e3d] focus:border-[#2c68f5] focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all placeholder:text-slate-400" placeholder="Paste alamat lengkap atau koordinat (ex: -6.91, 110.20)">
                     </div>
+                    <p class="text-[9px] text-slate-400 pl-1"><b>Tips:</b> Ketik nama jalan/sekolah atau salin koordinat angka langsung dari maps.</p>
                 </div>
                 <button type="button" id="btnSmartSearch" class="h-14 px-8 rounded-2xl bg-[#0f1e3d] text-white text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg shadow-slate-900/20 active:scale-95 flex items-center justify-center gap-3">
                     <i class="ti ti-wand text-lg text-[#ffd500]"></i>
@@ -253,19 +254,33 @@
             try {
                 let nLat, nLng;
 
-                // 1. Check for Google Maps URL pattern (@lat,lng)
+                // 1. Direct Coordinate Match (Lat, Lng)
+                const directCoords = query.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
+
+                // 2. Google Maps URL patterns
                 const urlCoordsMatch = query.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
                 const qCoordsMatch = query.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+                const cidMatch = query.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
 
-                if (urlCoordsMatch) {
+                if (directCoords) {
+                    nLat = parseFloat(directCoords[1]);
+                    nLng = parseFloat(directCoords[2]);
+                } else if (urlCoordsMatch) {
                     nLat = parseFloat(urlCoordsMatch[1]);
                     nLng = parseFloat(urlCoordsMatch[2]);
                 } else if (qCoordsMatch) {
                     nLat = parseFloat(qCoordsMatch[1]);
                     nLng = parseFloat(qCoordsMatch[2]);
+                } else if (cidMatch) {
+                    nLat = parseFloat(cidMatch[1]);
+                    nLng = parseFloat(cidMatch[2]);
+                } else if (query.startsWith('http')) {
+                    throw new Error("Link pendek tidak didukung. Mohon gunakan link panjang atau ketik alamat.");
                 } else {
-                    // 2. Geocoding using Nominatim (OpenStreetMap)
-                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+                    // 3. Geocoding using Nominatim (OpenStreetMap) with proper headers
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`, {
+                        headers: { 'Accept-Language': 'id' }
+                    });
                     const data = await response.json();
 
                     if (data && data.length > 0) {
@@ -275,6 +290,7 @@
                 }
 
                 if (nLat && nLng) {
+                    // Update numeric inputs
                     document.getElementById('inputLat').value = nLat.toFixed(7);
                     document.getElementById('inputLng').value = nLng.toFixed(7);
 
@@ -284,16 +300,16 @@
                     map.setView(newPos, 17);
 
                     feedback.classList.remove('hidden');
-                    feedback.querySelector('div').className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-600 text-[10px] font-bold border border-emerald-100";
-                    feedbackText.innerText = "Lokasi ditemukan & koordinat berhasil sinkron!";
+                    feedback.querySelector('div').className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-600 text-[10px] font-bold border border-emerald-100 shadow-sm";
+                    feedbackText.innerText = "Lokasi ditemukan! Koordinat dan peta berhasil disinkronkan.";
                 } else {
-                    throw new Error("Lokasi tidak dikenali.");
+                    throw new Error("Alamat tidak ditemukan. Coba ketik nama tempat yang lebih umum.");
                 }
 
             } catch (error) {
                 feedback.classList.remove('hidden');
-                feedback.querySelector('div').className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-red-50 text-red-600 text-[10px] font-bold border border-red-100";
-                feedbackText.innerText = "Gagal mendeteksi lokasi. Pastikan link/alamat benar.";
+                feedback.querySelector('div').className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-red-50 text-red-600 text-[10px] font-bold border border-red-100 shadow-sm";
+                feedbackText.innerText = error.message || "Gagal mendeteksi lokasi. Pastikan input benar.";
             } finally {
                 btnSearch.disabled = false;
                 btnSearch.innerHTML = '<i class="ti ti-wand text-lg text-[#ffd500]"></i> <span>Analisis & Generate</span>';
