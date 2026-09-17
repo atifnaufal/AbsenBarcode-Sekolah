@@ -50,8 +50,7 @@ class RegisterController extends Controller
         ]);
 
         $className = $data['class_name'];
-        if ($role === 'guru') {
-            // For Guru: "Wali Kelas XI RPL"
+        if ($role === 'guru' && !str_starts_with(strtolower($className), 'wali')) {
             $className = 'Wali Kelas ' . $className;
         }
 

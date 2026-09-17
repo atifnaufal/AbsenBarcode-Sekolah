@@ -24,6 +24,22 @@ class ReportController extends Controller{
 
         $usersCount = (clone $userQuery)->count();
 
+        // 🟢 FIX: Correctly calculate present count using whereHas for better performance and accuracy
+        $presentCountQuery = (clone $userQuery)->whereHas('attendances', function($q) use ($date, $filterType) {
+            if ($filterType === 'month') {
+                $q->whereMonth('attendance_date', date('m', strtotime($date)))->whereYear('attendance_date', date('Y', strtotime($date)));
+            } elseif ($filterType === 'year') {
+                $q->whereYear('attendance_date', date('Y', strtotime($date)));
+            } elseif ($filterType === 'semester') {
+                $m = date('m', strtotime($date)); $y = date('Y', strtotime($date));
+                $m >= 7 ? $q->whereBetween('attendance_date', ["$y-07-01", "$y-12-31"]) : $q->whereBetween('attendance_date', ["$y-01-01", "$y-06-30"]);
+            } else {
+                $q->whereDate('attendance_date', $date);
+            }
+        });
+
+        $presentCount = $presentCountQuery->count();
+
         $users = $userQuery->with(['attendances' => function($q) use ($date, $filterType) {
                 if ($filterType === 'month') {
                     $q->whereMonth('attendance_date', date('m', strtotime($date)))->whereYear('attendance_date', date('Y', strtotime($date)));
@@ -38,9 +54,6 @@ class ReportController extends Controller{
             }])
             ->orderBy('name')
             ->paginate(30)->withQueryString();
-
-        $presentCount = 0;
-        foreach($users as $u) { if($u->attendances->isNotEmpty()) $presentCount++; }
 
         $classes = User::where('role', UserRole::SISWA)->whereNotNull('class_name')->distinct()->pluck('class_name');
         $reportTitle = $this->getReportTitle($date, $filterType);

@@ -9,6 +9,7 @@ enum AttendanceResult: string
     case OUTSIDE_AREA = 'outside_area';
     case DUPLICATE = 'duplicate';
     case UNAVAILABLE = 'unavailable';
+    case LATE = 'late';
     case PERMISSION = 'permission';
     case SICK = 'sick';
     case ABSENT = 'absent';
@@ -21,6 +22,7 @@ enum AttendanceResult: string
             self::OUTSIDE_AREA => 'Di Luar Area',
             self::DUPLICATE => 'Sudah Tercatat',
             self::UNAVAILABLE => 'Belum Tersedia',
+            self::LATE => 'Terlambat',
             self::PERMISSION => 'Izin',
             self::SICK => 'Sakit',
             self::ABSENT => 'Tidak Hadir (Alfa)',
