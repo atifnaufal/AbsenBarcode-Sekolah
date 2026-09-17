@@ -15,7 +15,7 @@ class ReportController extends Controller{
 
         $userQuery = User::query()
             ->where('active', true)
-            ->where('role', $role === 'guru' ? UserRole::GURU : UserRole::SISWA);
+            ->where('role', $role === 'guru' ? UserRole::GURU->value : UserRole::SISWA->value);
 
         // If Siswa, allow filtering by class. If Guru, the user said "all user -> role guru"
         if ($role === 'siswa' && $className) {

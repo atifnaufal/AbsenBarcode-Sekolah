@@ -146,7 +146,7 @@
                                     </button>
                                 </div>
                                 <div x-show="editingId === {{ $a->id }}" class="flex items-center gap-2" x-cloak>
-                                    <form action="{{ route('attendances.update-keterangan', $a) }}" method="POST" class="flex items-center gap-2">
+                                    <form action="{{ route('admin.attendances.update-keterangan', $a) }}" method="POST" class="flex items-center gap-2">
                                         @csrf @method('PATCH')
                                         <input type="text" name="session_label" x-model="labelValue" class="h-9 w-40 bg-white border-2 border-[#2c68f5] rounded-xl px-3 text-xs font-bold outline-none shadow-lg">
                                         <button type="submit" class="h-9 px-3 bg-[#2c68f5] text-white rounded-xl text-[10px] font-black uppercase">Save</button>
@@ -154,7 +154,7 @@
                                     </form>
                                 </div>
                             @else
-                                <button @click="manualId = {{ $u->id }}; manualName = '{{ $u->name }}'; $nextTick(() => $refs.manualDialog.showModal())" class="h-8 px-4 rounded-xl border-2 border-dashed border-slate-200 text-[10px] text-slate-400 font-black uppercase tracking-widest hover:border-[#2c68f5] hover:text-[#2c68f5] transition-all">+ Catat Izin</button>
+                                <button @click="manualId = {{ $u->id }}; manualName = '{{ addslashes($u->name) }}'; $nextTick(() => $refs.manualDialog.showModal())" class="h-8 px-4 rounded-xl border-2 border-dashed border-slate-200 text-[10px] text-slate-400 font-black uppercase tracking-widest hover:border-[#2c68f5] hover:text-[#2c68f5] transition-all">+ Catat Izin</button>
                             @endif
                         </td>
                         <td class="px-8 py-5 text-center font-mono font-black text-xs text-[#0f1e3d] {{ !$a ? 'opacity-20' : '' }}">
@@ -205,7 +205,7 @@
                 <h3 class="font-black font-display uppercase tracking-[0.15em] text-lg">Pencatatan Manual</h3>
                 <p class="text-[10px] font-bold text-white/60 mt-1 uppercase tracking-widest" x-text="manualName"></p>
             </div>
-            <form method="POST" action="{{ route('attendances.store-manual') }}" class="p-8 space-y-6 bg-white">
+            <form method="POST" action="{{ route('admin.attendances.store-manual') }}" class="p-8 space-y-6 bg-white">
                 @csrf
                 <input type="hidden" name="user_id" :value="manualId">
                 <input type="hidden" name="attendance_date" value="{{ $date }}">
